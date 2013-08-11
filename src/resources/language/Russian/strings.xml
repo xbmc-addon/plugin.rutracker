@@ -1,0 +1,183 @@
+<strings>
+	<string id="30001">Сервер временно не доступен.|Попробуйте позже.</string>
+	<string id="30002">Форум временно отключен.|Повторите попытку через 10-15 минут.</string>
+	<string id="30003">Описание не найдено.</string>
+	<string id="30004">Скриншоты не найдены.</string>
+	<string id="30005">Комментарии отсутствуют.</string>
+	<string id="30008">Ничего не найдено.</string>
+	<string id="30009">Рецензии не найдены</string>
+	<string id="30010">Кэш сброшен</string>
+	<string id="30011">Файл был полностью скачен.|Хотите перенести его в коллекцию?</string>
+	<string id="30012">Копируем файл в коллекцию...</string>
+	<string id="30013">Файл успешно перенесен в коллекцию.</string>
+	<string id="30014">Не смогли подключиться к торрент-клиенту.|Проверьте, включен ли он.|Также проверьте настройки дополнения.</string>
+	<string id="30015">Торрент успешно добавлен.|Скачивание файлов раздачи запущено.|Открыть плагин uTorrent?</string>
+	<string id="30016">Торрент успешно добавлен.|Скачивание файлов раздачи запущено.|Открыть плагин Transmission?</string>
+	<string id="30020">Контент добавлен в закладки</string>
+	<string id="30021">Контент удален из закладок</string>
+	<string id="30030">Процесс форсированного кэширования может|занять довольно продолжительное время.|Уверены, что хотите продолжить?</string>
+	<string id="30031">Форсированное кэширование раздела завершено.</string>
+	
+	<string id="30101">Назад</string>
+	<string id="30102">Вперед</string>
+	<string id="30103">Страница</string>
+	<string id="30104">Загружаем комментарии...</string>
+	<string id="30105">Загружаем рецензии...</string>
+	<string id="30111">Стаж</string>
+	<string id="30112">Сообщений</string>
+	<string id="30113">Откуда</string>
+	<string id="30114">Поиск</string>
+	
+	
+	<string id="40001">Информация</string>
+	<string id="40002">Описание</string>
+	<string id="40003">Скриншоты</string>
+	<string id="40004">Комментарии</string>
+	<string id="40005">Статус раздачи</string>
+	<string id="40006">Поиск похожих раздач</string>
+	<string id="40007">Рецензии</string>
+	<string id="40008">Смотреть через LibTorrent</string>
+	<string id="40009">Добавить в закладки</string>
+	<string id="40010">Удалить из закладок</string>
+	<string id="40015">Настройки дополнения</string>
+	<string id="40020">Передать в uTorrent</string>
+	<string id="40021">Передать в Transmission</string>
+	<string id="40030">Форсированное кэширование</string>
+	
+	<string id="40101">Трейлеры</string>
+	<string id="40102">Продолжительность</string>
+	<string id="40103">мин.</string>
+	
+	<string id="40491">Сиды</string>
+	<string id="40492">Личи</string>
+	<string id="40493">Скачали</string>
+	<string id="40494">Комментарии</string>
+	
+	<string id="40501">премодерация</string>
+	<string id="40502">проверяется</string>
+	<string id="40503">повтор</string>
+	<string id="40504">не оформлено</string>
+	<string id="40505">закрыто правообладателем</string>
+	<string id="40506">закрыто</string>
+	<string id="40507">поглощено</string>
+	<string id="40508">не проверено</string>
+	<string id="40509">недооформлено</string>
+	<string id="40510">сомнительно</string>
+	<string id="40511">временная</string>
+	<string id="40512">проверено</string>
+	
+	<string id="40801">Получаем список объектов в разделе...</string>
+	<string id="40802">Страница</string>
+	<string id="40803">Кэшируем контент в разделе...</string>
+	<string id="40804">Объект</string>
+	
+	<string id="50101">Логин</string>
+	<string id="50102">Пароль</string>
+	<string id="50103">Показывать статус раздач в их названиях</string>
+	<string id="50104">Очистить кэш для сайта RuTracker</string>
+	<string id="50105">Показывать рейтинг раздач (например - IMDb) в их названиях</string>
+	<string id="50106">Автоматически подгружать обои</string>
+	
+	<string id="50201">Максимальное качество трейлеров</string>
+	<string id="50202">Низкое</string>
+	<string id="50203">Среднее</string>
+	<string id="50204">Высокое</string>
+	<string id="50205">HD низкое</string>
+	<string id="50206">HD среднее</string>
+	<string id="50207">HD высокое</string>
+	<string id="50210">Количество записей на странице при поиске</string>
+	<string id="50211">Очистить кэш для сайта KinoPoisk</string>
+	
+	<string id="50301">Директория для сохранения файлов</string>
+	<string id="50302">Вызывать диалог</string>
+	<string id="50303">Задать по умолчанию</string>
+	<string id="50304">Путь к директории</string>
+	<string id="50305">Создавать поддиректорию для скрапера</string>
+	
+	<string id="50311">Торрент-клиент</string>
+	<string id="50312">Хост</string>
+	<string id="50313">Порт</string>
+	<string id="50314">URL</string>
+	<string id="50315">Логин</string>
+	<string id="50316">Пароль</string>
+	
+	<string id="50401">Действия со скаченными файлами</string>
+	<string id="50402">Удалять</string>
+	<string id="50403">Сохранять</string>
+	<string id="50404">Предлагать сохранить</string>
+	<string id="50411">Использовать собственную директорию для буфера</string>
+	<string id="50412">Директория для буфера</string>
+	
+	<string id="50501">Оставаться на раздаче после скачивания файлов</string>
+	<string id="50502">Ограничивать скорость раздачи</string>
+	<string id="50503">Максимальная скорость</string>
+	
+	<string id="50521">Сообщать во время проигрывания о завершении загрузки</string>
+	<string id="50522">Сортировать файлы раздачи в обратном порядке</string>
+	
+	<string id="50531">Минимальный размер буфера (Мбайт)</string>
+	
+	<string id="70101">Имя</string>
+	<string id="70102">Жанр</string>
+	<string id="70103">Дата</string>
+	<string id="70104">Рейтинг</string>
+	<string id="70105">Оценок</string>
+	<string id="70106">Страна</string>
+	<string id="70110">Искать</string>
+	
+	<string id="70201">Полное или частичное название фильма</string>
+	<string id="70202">Жанр фильма</string>
+	<string id="70203">Дата выпуска фильма</string>
+	<string id="70204">Минимальный рейтинг</string>
+	<string id="70205">Количество оценок</string>
+	<string id="70206">Минимальный возраст по MPAA</string>
+	<string id="70207">Фильм вышел на DVD?</string>
+	<string id="70208">Страна производства</string>
+	
+	<string id="70301">Все</string>
+	<string id="70302">от</string>
+	<string id="70303">Не обязательно</string>
+	<string id="70304">Да</string>
+	
+	<string id="70401">Имя / Фамилия</string>
+	<string id="70402">Амплуа</string>
+	
+	<string id="80101">Все жанры</string>
+	<string id="80102">Аниме</string>
+	<string id="80103">Биография</string>
+	<string id="80104">Боевик</string>
+	<string id="80105">Вестерн</string>
+	<string id="80106">Военный</string>
+	<string id="80107">Детектив</string>
+	<string id="80108">Детский</string>
+	<string id="80109">Документальный</string>
+	<string id="80110">Драма</string>
+	<string id="80111">Игра</string>
+	<string id="80112">История</string>
+	<string id="80113">Комедия</string>
+	<string id="80114">Концерт</string>
+	<string id="80115">Короткометражка</string>
+	<string id="80116">Криминал</string>
+	<string id="80117">Мелодрама</string>
+	<string id="80118">Музыка</string>
+	<string id="80119">Мультфильм</string>
+	<string id="80120">Мюзикл</string>
+	<string id="80121">Новости</string>
+	<string id="80122">Приключения</string>
+	<string id="80123">Реальное ТВ</string>
+	<string id="80124">Семейный</string>
+	<string id="80125">Спорт</string>
+	<string id="80126">Ток-шоу</string>
+	<string id="80127">Триллер</string>
+	<string id="80128">Ужасы</string>
+	<string id="80129">Фантастика</string>
+	<string id="80130">Фильм-нуар</string>
+	<string id="80131">Фэнтези</string>
+	
+	<string id="90001">Рецензии зрителей</string>
+	<string id="90011">Положительные</string>
+	<string id="90012">Отрицательные</string>
+	<string id="90013">Нейтральные</string>
+	<string id="90014">Все рецензии</string>
+	
+</strings>

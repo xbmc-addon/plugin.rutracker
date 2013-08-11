@@ -1,0 +1,183 @@
+<strings>
+	<string id="30001">The server is temporarily unavailable.|Please try again later.</string>
+	<string id="30002">The forum is temporarily down.|Please try again in 10-15 minutes.</string>
+	<string id="30003">The description was not found.</string>
+	<string id="30004">Screenshots were not found.</string>
+	<string id="30005">There are no comments.</string>
+	<string id="30008">Not found.</string>
+	<string id="30009">The review was not found</string>
+	<string id="30010">The cache was empty</string>
+	<string id="30011">The file has been completely downloaded.|Do you want to transfer it to the movies folder?</string>
+	<string id="30012">Copy the file to the movies folder...</string>
+	<string id="30013">The file has been successfully transferred to the movies folder.</string>
+	<string id="30014">Could not connect to the torrent client.|Check if it is available.|Also check the settings of your add-on.</string>
+	<string id="30015">The torrent was successfully added.|The download has started.|Open the plugin uTorrent?</string>
+	<string id="30016">The torrent was successfully added.|The download has started.|Open the plugin Transmission?</string>
+	<string id="30020">The content is added to favorites</string>
+	<string id="30021">The content was removed from favorites</string>
+	<string id="30030">The process of forced caching|can take quite a long time.|Are you sure that you want to continue?</string>
+	<string id="30031">The forced caching section was completed.</string>
+	
+	<string id="30101">Back</string>
+	<string id="30102">Forward</string>
+	<string id="30103">Page</string>
+	<string id="30104">Loading comments...</string>
+	<string id="30105">Loading reviews...</string>
+	<string id="30111">Experience</string>
+	<string id="30112">Posts</string>
+	<string id="30113">From</string>
+	<string id="30114">Find</string>
+	
+	
+	<string id="40001">Information</string>
+	<string id="40002">Description</string>
+	<string id="40003">Screenshots</string>
+	<string id="40004">Comments</string>
+	<string id="40005">Status of the distribution</string>
+	<string id="40006">Searching for similar distributions</string>
+	<string id="40007">Reviews</string>
+	<string id="40008">Watch using LibTorrent</string>
+	<string id="40009">Add to favorites</string>
+	<string id="40010">Remove from favorites</string>
+	<string id="40015">Add-on settings</string>
+	<string id="40020">Transfer to uTorrent</string>
+	<string id="40021">Transfer to Transmission</string>
+	<string id="40030">Forced caching</string>
+	
+	<string id="40101">Trailers</string>
+	<string id="40102">Runtime</string>
+	<string id="40103">min</string>
+	
+	<string id="40491">Seeders</string>
+	<string id="40492">Leechers</string>
+	<string id="40493">Downloaded</string>
+	<string id="40494">Comments</string>
+	
+	<string id="40501">premoderation</string>
+	<string id="40502">checking</string>
+	<string id="40503">repeat</string>
+	<string id="40504">not issued</string>
+	<string id="40505">copyright</string>
+	<string id="40506">closed</string>
+	<string id="40507">swallow up</string>
+	<string id="40508">not checked</string>
+	<string id="40509">not completely issued</string>
+	<string id="40510">doubtful</string>
+	<string id="40511">temporary</string>
+	<string id="40512">checked</string>
+	
+	<string id="40801">Get a list of objects in the section...</string>
+	<string id="40802">Page</string>
+	<string id="40803">Caching the content in the section...</string>
+	<string id="40804">Object</string>
+	
+	<string id="50101">Login</string>
+	<string id="50102">Password</string>
+	<string id="50103">Show status of distribution in their names</string>
+	<string id="50104">Clear the cache for the site RuTracker</string>
+	<string id="50105">Show rating of distributions (ex. - IMDb) in their names</string>
+	<string id="50106">Automatically download wallpapers</string>
+	
+	<string id="50201">The maximum quality of trailers</string>
+	<string id="50202">Low</string>
+	<string id="50203">Middle</string>
+	<string id="50204">High</string>
+	<string id="50205">Low HD</string>
+	<string id="50206">Middle HD</string>
+	<string id="50207">High HD</string>
+	<string id="50210">The number of results per page when searching</string>
+	<string id="50211">Clear the cache for the site KinoPoisk</string>
+	
+	<string id="50301">The directory for saving files</string>
+	<string id="50302">Open a dialogue window</string>
+	<string id="50303">Default setting</string>
+	<string id="50304">The path to the directory</string>
+	<string id="50305">Create a subdirectory for scraper</string>
+	
+	<string id="50311">Torrent client</string>
+	<string id="50312">Host</string>
+	<string id="50313">Port</string>
+	<string id="50314">URL</string>
+	<string id="50315">Login</string>
+	<string id="50316">Password</string>
+	
+	<string id="50401">Actions with the downloaded files</string>
+	<string id="50402">Delete</string>
+	<string id="50403">Save</string>
+	<string id="50404">Offer to save</string>
+	<string id="50411">Use your own directory for the buffer</string>
+	<string id="50412">Directory for the buffer</string>
+	
+	<string id="50501">Stay in the distribution after downloading the files</string>
+	<string id="50502">Limit the upload speed</string>
+	<string id="50503">The maximum speed</string>
+	
+	<string id="50521">Notify me when the download is finished</string>
+	<string id="50522">Sort the distribution files in reverse order</string>
+	
+	<string id="50531">The minimum buffer size (MB)</string>
+	
+	<string id="70101">Name</string>
+	<string id="70102">Genre</string>
+	<string id="70103">Date</string>
+	<string id="70104">Rating</string>
+	<string id="70105">Ratings</string>
+	<string id="70106">Country</string>
+	<string id="70110">Find</string>
+	
+	<string id="70201">Full or partial name of the movie</string>
+	<string id="70202">The genre of the movie</string>
+	<string id="70203">The movie`s release date</string>
+	<string id="70204">The minimum rating</string>
+	<string id="70205">Number of ratings</string>
+	<string id="70206">The minimum age according to MPAA</string>
+	<string id="70207">Was the movie released on DVD?</string>
+	<string id="70208">Is the movie on DVD?</string>
+	
+	<string id="70301">All</string>
+	<string id="70302">from</string>
+	<string id="70303">Not necessarily</string>
+	<string id="70304">Yes</string>
+	
+	<string id="70401">First name / Last name</string>
+	<string id="70402">Type</string>
+	
+	<string id="80101">All genres</string>
+	<string id="80102">Anime</string>
+	<string id="80103">Biography</string>
+	<string id="80104">Action</string>
+	<string id="80105">Western</string>
+	<string id="80106">War</string>
+	<string id="80107">Mystery</string>
+	<string id="80108">Child's</string>
+	<string id="80109">Documentary</string>
+	<string id="80110">Drama</string>
+	<string id="80111">Game-Show</string>
+	<string id="80112">History</string>
+	<string id="80113">Comedy</string>
+	<string id="80114">Concert</string>
+	<string id="80115">Short film</string>
+	<string id="80116">Crime</string>
+	<string id="80117">Romance</string>
+	<string id="80118">Music</string>
+	<string id="80119">Animation</string>
+	<string id="80120">Musical</string>
+	<string id="80121">News</string>
+	<string id="80122">Adventure</string>
+	<string id="80123">Reality-TV</string>
+	<string id="80124">Family</string>
+	<string id="80125">Sport</string>
+	<string id="80126">Talk-Show</string>
+	<string id="80127">Thriller</string>
+	<string id="80128">Horror</string>
+	<string id="80129">Sci-Fi</string>
+	<string id="80130">Film-Noir</string>
+	<string id="80131">Fantasy</string>
+	
+	<string id="90001">Reviews</string>
+	<string id="90011">Positive</string>
+	<string id="90012">Negative</string>
+	<string id="90013">Neutral</string>
+	<string id="90014">All reviews</string>
+	
+</strings>
