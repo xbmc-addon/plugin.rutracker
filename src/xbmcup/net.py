@@ -21,6 +21,14 @@ except ImportError:
 else:
     _IS_LIBTORRENT = True
 
+try:
+    from TSCore import TSengine
+except ImportError:
+    _IS_TORRENTSTREAM = False
+else:
+    _IS_TORRENTSTREAM = True
+
+
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 RE = {
@@ -657,8 +665,7 @@ class Transmission:
 
 class LibTorrent:
     def __init__(self):
-        self.is_install = _IS_LIBTORRENT
-    
+        self.is_install = _IS_LIBTORRENT    
     
     def list(self, torrent, reverse=False):
         files = [{'id': i, 'name': x.path.split(os.sep)[-1], 'size': x.size} for i, x in enumerate(self._torrent_info(torrent).files())]
@@ -847,4 +854,66 @@ class LibTorrent:
         else:
             return u'%10.2f %s' % (float(size)/float(factor), human)
     
+
+# ################################
+#
+#   TORRENT STREAM
+#
+# ################################
+
+class TorrentStream:
+    def __init__(self, portfile=None):
+        self.is_install = _IS_TORRENTSTREAM
+        self._portfile = portfile
     
+    def list(self, torrent, reverse=False):
+        ts = TSengine()
+        if str(ts.load_torrent(base64.b64encode(torrent), 'RAW', port=self._get_port())).upper() != 'OK':
+            ts.end()
+            return None
+        
+        if not ts.files or not isinstance(ts.files, dict):
+            ts.end()
+            return None
+        
+        files = [{'id': v, 'name': k} for k, v in ts.files.iteritems()]
+        ts.end()
+        files.sort(cmp=lambda f1, f2: cmp(f1['name'], f2['name']))
+        if reverse:
+            files.reverse()
+        return files
+        
+    
+    def play(self, torrent, file_id, title=None, icon=None, cover=None):
+        if not title:
+            title = ''
+        if not icon:
+            icon = ''
+        if not cover:
+            cover = ''
+            
+        ts = TSengine()
+        if str(ts.load_torrent(base64.b64encode(torrent), 'RAW', port=self._get_port())).upper() != 'OK':
+            ts.end()
+            return
+        
+        ts.play_url_ind(int(file_id), title, icon, cover)
+        ts.end()
+
+    def _get_port(self):
+        port = None
+        if self._portfile:
+            try:
+                port = int(file(self._portfile, 'rb').read())
+            except:
+                pass
+        if not port:
+            try:
+                port = int(file(os.path.normpath(os.path.join(os.path.expanduser('~'), 'AppData/Roaming/TorrentStream/engine', 'acestream.port')), 'rb').read())
+            except:
+                pass
+        return port if port else 62062
+
+
+
+

@@ -65,4 +65,8 @@
 		<setting id="libtorrent_notice" type="bool" label="50521" default="true"/>
 		<setting id="libtorrent_reverse" type="bool" label="50522" default="false"/>
 	</category>
+	<category label="TorrentStream">
+		<setting id="torrentstream_reverse" type="bool" label="50522" default="false"/>
+        <setting id="torrentstream_port" type="file" label="50523" default=""/>
+	</category>
 </settings>

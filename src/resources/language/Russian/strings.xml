@@ -42,6 +42,7 @@
 	<string id="40015">Настройки дополнения</string>
 	<string id="40020">Передать в uTorrent</string>
 	<string id="40021">Передать в Transmission</string>
+	<string id="40023">Смотреть через TorrentStream</string>
 	<string id="40030">Форсированное кэширование</string>
 	
 	<string id="40101">Трейлеры</string>
@@ -114,6 +115,7 @@
 	
 	<string id="50521">Сообщать во время проигрывания о завершении загрузки</string>
 	<string id="50522">Сортировать файлы раздачи в обратном порядке</string>
+	<string id="50523">Путь к файлу acestream.port</string>
 	
 	<string id="50531">Минимальный размер буфера (Мбайт)</string>
 	

@@ -12,7 +12,7 @@ except:
     from pysqlite2 import dbapi2 as sqlite
 
 from xbmcup.app import Plugin, Handler, Link, Lang
-from xbmcup.net import Torrent, LibTorrent
+from xbmcup.net import Torrent, LibTorrent, TorrentStream
 from xbmcup.cache import Cache
 
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
@@ -551,7 +551,7 @@ class RutrackerBase(Handler, Scrapers):
                         scraper['title'] = rating + u'  ' + scraper['title']
                     
                     # вывод
-                    self.item(Link('download', {'id': item['id'], 'content': self.argv['content'], 'subdir': scraper['subdir'], 'icon': scraper['icon'], 'thumb': scraper['thumb'], 'fanart': scraper['fanart'], 'bookmark': scraper['bookmark']}), title=scraper['title'], icon=scraper['icon'], thumb=scraper['thumb'], fanart=scraper['fanart'], media=CONTENT[self.argv['content']]['media'], info=scraper['info'], popup=popup, popup_replace=True, folder=False, total=total)
+                    self.item(Link('download', {'id': item['id'], 'content': self.argv['content'], 'subdir': scraper['subdir'], 'icon': scraper['icon'], 'thumb': scraper['thumb'], 'fanart': scraper['fanart'], 'bookmark': scraper['bookmark'], 'title': scraper['title']}), title=scraper['title'], icon=scraper['icon'], thumb=scraper['thumb'], fanart=scraper['fanart'], media=CONTENT[self.argv['content']]['media'], info=scraper['info'], popup=popup, popup_replace=True, folder=False, total=total)
             
             # нижний паджинатор
             if data['pages'][3]:
@@ -1068,22 +1068,31 @@ class Download(TorrentBase):
     def handle(self):
         config = self.get_torrent_client()
         
-        stream = False
-        if CONTENT[self.argv['content']]['stream'] and LibTorrent().is_install:
-            
+        stream = None
+        if CONTENT[self.argv['content']]['stream'] and (LibTorrent().is_install or TorrentStream().is_install):
+
+            msg = []
+
+            if LibTorrent().is_install:
+                msg.append(('libtorrent', self.lang[40008]))
+
+            if TorrentStream().is_install:
+                msg.append(('torrentstream', self.lang[40023]))
+
             if config['client'] == 'utorrent':
-                msg = 40020
+                msg.append(('utorrent', self.lang[40020]))
             else:
-                msg = 40021
+                msg.append(('transmission', self.lang[40021]))
             
             dialog = xbmcgui.Dialog()
-            index = dialog.select(u'RuTracker', [self.lang[40008], self.lang[msg]])
+            index = dialog.select(u'RuTracker', [x[1] for x in msg])
             if index < 0:
                 return True
-            elif index == 0:
-                stream = True
+            else:
+                stream = msg[index][0]
         
-        if stream:
+        if stream in ('libtorrent', 'torrentstream'):
+            self.argv['engine'] = stream
             self.run(Link('stream', self.argv))
         else:
             torrent = self.download()
@@ -1145,6 +1154,44 @@ class Download(TorrentBase):
 
 class Stream(TorrentBase):
     def handle(self):
+        if self.argv['engine'] == 'libtorrent':
+            self._libtorrent()
+        else:
+            self._torrentstream()
+
+
+
+    def _torrentstream(self):
+        # проигрываем файл
+        if 'file_id' in self.argv:
+            torrent = file(xbmc.translatePath('special://temp/plugin.rutracker.torrentstream.cache.torrent'), 'rb').read()
+            filename = TorrentStream(self.setting['torrentstream_port']).play(torrent, self.argv['file_id'], self.argv['title'], self.argv['icon'], self.argv['thumb'])
+            return True
+        
+        # получаем список файлов из торрента
+        else:
+            torrent = self.download()
+            if not torrent:
+                return True
+            
+            # кэшируем торрент
+            file(xbmc.translatePath('special://temp/plugin.rutracker.torrentstream.cache.torrent'), 'wb').write(torrent)
+            
+            filelist = TorrentStream(self.setting['torrentstream_port']).list(torrent, bool(self.setting['torrentstream_reverse'] == 'true'))
+            if not filelist:
+                return True
+            
+            total = len(filelist)
+            
+            for f in filelist:
+                self.argv['file_id'] = f['id']
+                self.argv['title'] = f['name']
+                self.item(Link('stream', self.argv), title=f['name'], media=CONTENT[self.argv['content']]['media'], popup=[(Link('setting'), self.lang[40015])], icon=self.argv['icon'], thumb=self.argv['thumb'], fanart=self.argv['fanart'], popup_replace=True, folder=False, total=total)
+                
+            self.render(mode='full')
+            
+
+    def _libtorrent(self):
         # первый запуск
         buffer = self.path(u'libtorrent')
         if not os.path.isdir(buffer):
@@ -1222,8 +1269,8 @@ class Stream(TorrentBase):
                 self.item(Link('stream', self.argv), title=f['name'], media=CONTENT[self.argv['content']]['media'], info={'size': f['size']}, popup=[(Link('setting'), self.lang[40015])], icon=self.argv['icon'], thumb=self.argv['thumb'], fanart=self.argv['fanart'], popup_replace=True, folder=False, total=total)
                 
             self.render(mode='full')
-    
-    
+
+
     def _copy(self, filename, dirname):
         progress = xbmcgui.DialogProgress()
         progress.create(u'RuTracker')
@@ -1357,11 +1404,10 @@ class Trailer(Handler):
     
 class Screenshot(Handler):
     def handle(self):
-        print str(self.argv)
         xbmc.executehttpapi('ClearSlideshow')
         for url in self.argv:
-            #xbmc.executehttpapi('AddToSlideshow(%s)' % url)
-            xbmc.executehttpapi('AddToSlideshow(%s)' % 'http://st-im.kinopoisk.ru/im/wallpaper/1/3/7/kinopoisk.ru-Stone-1372763--w--1280.jpg')
+            xbmc.executehttpapi('AddToSlideshow(%s)' % url)
+            #xbmc.executehttpapi('AddToSlideshow(%s)' % 'http://st-im.kinopoisk.ru/im/wallpaper/1/3/7/kinopoisk.ru-Stone-1372763--w--1280.jpg')
         xbmc.executebuiltin('SlideShow(,recursive,notrandom)')
         return True
 
