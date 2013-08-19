@@ -876,7 +876,7 @@ class TorrentStream:
             ts.end()
             return None
         
-        files = [{'id': v, 'name': k} for k, v in ts.files.iteritems()]
+        files = [{'id': v, 'name': urllib.unquote(k)} for k, v in ts.files.iteritems()]
         ts.end()
         files.sort(cmp=lambda f1, f2: cmp(f1['name'], f2['name']))
         if reverse:
