@@ -21,6 +21,8 @@ from drivers.rutracker import RuTracker
 from drivers.kinopoisk import KinoPoisk
 from drivers.tvdb import TvDb
 
+import delugestream
+
 CONTENT = {
 
 'movie': {
@@ -1079,11 +1081,13 @@ class Download(TorrentBase):
             if TorrentStream().is_install:
                 msg.append(('torrentstream', self.lang[40023]))
 
+            msg.append(('delugestream', 'DelugeStream'))
+
             if config['client'] == 'utorrent':
                 msg.append(('utorrent', self.lang[40020]))
             else:
                 msg.append(('transmission', self.lang[40021]))
-            
+
             dialog = xbmcgui.Dialog()
             index = dialog.select(u'RuTracker', [x[1] for x in msg])
             if index < 0:
@@ -1091,7 +1095,7 @@ class Download(TorrentBase):
             else:
                 stream = msg[index][0]
         
-        if stream in ('libtorrent', 'torrentstream'):
+        if stream in ('libtorrent', 'torrentstream', 'delugestream'):
             self.argv['engine'] = stream
             self.run(Link('stream', self.argv))
         else:
@@ -1156,8 +1160,40 @@ class Stream(TorrentBase):
     def handle(self):
         if self.argv['engine'] == 'libtorrent':
             self._libtorrent()
+        elif self.argv['engine'] == 'delugestream':
+            self._delugestream()
         else:
             self._torrentstream()
+
+
+    def _delugestream(self):
+        # проигрываем файл
+        if 'file_id' in self.argv:
+            torrent = file(xbmc.translatePath('special://temp/plugin.rutracker.cache.torrent'), 'rb').read()
+            delugestream.play(torrent, self.argv['file_id'], self.argv['title'], self.argv['thumb'], 'plugin.rutracker')
+            return True
+        
+        # получаем список файлов из торрента
+        else:
+            torrent = self.download()
+            if not torrent:
+                return True
+            
+            # кэшируем торрент
+            file(xbmc.translatePath('special://temp/plugin.rutracker.cache.torrent'), 'wb').write(torrent)
+            
+            filelist = delugestream.files(torrent)
+            if not filelist:
+                return True
+            
+            total = len(filelist)
+            
+            for f in filelist:
+                self.argv['file_id'] = f['fid']
+                self.argv['title'] = f['name']
+                self.item(Link('stream', self.argv), title=f['name'], media=CONTENT[self.argv['content']]['media'], popup=[(Link('setting'), self.lang[40015])], icon=self.argv['icon'], thumb=self.argv['thumb'], fanart=self.argv['fanart'], popup_replace=True, folder=False, total=total)
+                
+            self.render(mode='full')
 
 
 

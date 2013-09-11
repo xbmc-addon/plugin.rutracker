@@ -118,6 +118,11 @@
 	<string id="50523">Путь к файлу acestream.port</string>
 	
 	<string id="50531">Минимальный размер буфера (Мбайт)</string>
+
+	<string id="50541">Хост</string>
+    <string id="50542">Порт</string>
+    <string id="50543">Размер буффера (%)</string>
+    <string id="50544">Минимальный размер буффера (Мбайт)</string>
 	
 	<string id="70101">Имя</string>
 	<string id="70102">Жанр</string>

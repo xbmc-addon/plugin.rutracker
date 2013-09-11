@@ -69,4 +69,11 @@
 		<setting id="torrentstream_reverse" type="bool" label="50522" default="false"/>
         <setting id="torrentstream_port" type="file" label="50523" default=""/>
 	</category>
+
+	<category label="DelugeStream">
+		<setting id="delugestream_host" type="ipaddress" label="50541" values="127.0.0.1" default="127.0.0.1" />
+		<setting id="delugestream_port" type="number" label="50542" values="5757" default="5757" />
+		<setting id="delugestream_buffer_percent" type="slider" label="50543" range="0,100" default="2" option="percent" />
+		<setting id="delugestream_buffer_min" type="number" label="50544" values="20" default="20" />
+	</category>
 </settings>

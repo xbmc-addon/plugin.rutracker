@@ -117,7 +117,12 @@
 	<string id="50522">Sort the distribution files in reverse order</string>
 	<string id="50523">Path to the file acestream.port</string>
 	
-	<string id="50531">The minimum buffer size (MB)</string>
+	<string id="50531">Minimal size of buffer (MB)</string>
+
+	<string id="50541">Host</string>
+    <string id="50542">Port</string>
+    <string id="50543">Size of buffer (%)</string>
+    <string id="50544">Minimal size of buffer (MB)</string>
 	
 	<string id="70101">Name</string>
 	<string id="70102">Genre</string>
