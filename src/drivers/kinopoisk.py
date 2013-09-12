@@ -679,14 +679,14 @@ class KinoPoisk:
         
         # режисеры, сценаристы, жанры
         for tag, reg in (
-            ('director', u'<td class="type">режиссер</td><td[^>]*>(.+?)</td>'),
+            ('director', u'<td itemprop="director">(.+?)</td>'),
             ('writer', u'<td class="type">сценарий</td><td[^>]*>(.+?)</td>'),
-            ('genre', u'<td class="type">жанр</td><td[^>]*>(.+?)</td>')
+            ('genre', u'<td itemprop="genre">(.+?)</td>')
             ):
-            r = re.compile(reg, re.U).search(html)
+            r = re.compile(reg, re.U|re.S).search(html)
             if r:
                 r2 = []
-                for r in re.compile('<a [^>]+>([^<]+)</a>', re.U).findall(r.group(1)):
+                for r in re.compile('<a href="[^"]+">([^<]+)</a>', re.U).findall(r.group(1)):
                     r = self.html.string(r)
                     if r and r != '...':
                         r2.append(r)
