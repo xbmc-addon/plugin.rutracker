@@ -2,7 +2,7 @@
 <addon id="plugin.rutracker" name="RuTracker" version="0.15.1" provider-name="HAL9000">
   <requires>
     <import addon="xbmc.python" version="2.0" />
-    <import addon="script.module.delugestream" varsion="0.0.1" />
+    <import addon="script.module.delugestream" varsion="0.0.2" />
     <import addon="script.module.torrent.ts" optional="true" />
   </requires>
   <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
