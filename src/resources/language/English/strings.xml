@@ -43,6 +43,7 @@
 	<string id="40020">Transfer to uTorrent</string>
 	<string id="40021">Transfer to Transmission</string>
 	<string id="40023">Watch using TorrentStream</string>
+	<string id="40024">Watch using DelugeStream</string>
 	<string id="40030">Forced caching</string>
 	
 	<string id="40101">Trailers</string>

@@ -1071,7 +1071,7 @@ class Download(TorrentBase):
         config = self.get_torrent_client()
         
         stream = None
-        if CONTENT[self.argv['content']]['stream'] and (LibTorrent().is_install or TorrentStream().is_install):
+        if CONTENT[self.argv['content']]['stream']:
 
             msg = []
 
@@ -1081,7 +1081,7 @@ class Download(TorrentBase):
             if TorrentStream().is_install:
                 msg.append(('torrentstream', self.lang[40023]))
 
-            msg.append(('delugestream', 'DelugeStream'))
+            msg.append(('delugestream', self.lang[40024]))
 
             if config['client'] == 'utorrent':
                 msg.append(('utorrent', self.lang[40020]))
