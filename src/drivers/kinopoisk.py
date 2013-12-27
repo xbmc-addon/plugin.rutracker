@@ -661,7 +661,7 @@ class KinoPoisk:
             ('title', '<title>(.+?)</title>', 'str'),
             ('originaltitle', 'itemprop="alternativeHeadline">([^<]*)</span>', 'str'),
             ('tagline', '<td style="color\: #555">&laquo;(.+?)&raquo;</td></tr>', 'str'),
-            ('mpaa', 'itemprop="contentRating"\s+content="MPAA\s+([^"]+)"', 'str'),
+            ('mpaa', 'images/mpaa/([^\.]+).gif', 'str'),
             ('runtime', '<td class="time" id="runtime">[^<]+<span style="color\: #999">/</span>([^<]+)</td>', 'str'),
             ('year', '<a href="/lists/m_act%5Byear%5D/([0-9]+)/"', 'int'),
             ('top250', 'Топ250\: <a\shref="/level/20/#([0-9]+)', 'int')
@@ -681,7 +681,7 @@ class KinoPoisk:
         for tag, reg in (
             ('director', u'<td itemprop="director">(.+?)</td>'),
             ('writer', u'<td class="type">сценарий</td><td[^>]*>(.+?)</td>'),
-            ('genre', u'<td itemprop="genre">(.+?)</td>')
+            ('genre', u'<span itemprop="genre">(.+?)</span>')
             ):
             r = re.compile(reg, re.U|re.S).search(html)
             if r:
@@ -694,7 +694,7 @@ class KinoPoisk:
                     res['info'][tag] = u', '.join(r2)
         
         # актеры
-        r = re.compile(u'<h4>В главных ролях:</h4><ul>(.+?)</ul>', re.U|re.S).search(html)
+        r = re.compile(u'<h4>В главных ролях:</h4>(.+?)</ul>', re.U|re.S).search(html)
         if r:
             actors = []
             for r in re.compile('<li itemprop="actors"><a [^>]+>([^<]+)</a></li>', re.U).findall(r.group(1)):
@@ -717,6 +717,7 @@ class KinoPoisk:
         if r:
             res['info']['rating'] = float(r.group(1).strip())
             res['info']['votes'] = r.group(2).strip()
+
         
         # премьера
         r = re.compile(u'премьера \(мир\)</td>(.+?)</tr>', re.U|re.S).search(html)
@@ -744,14 +745,12 @@ class KinoPoisk:
         if r:
             poster = r.group(1).replace("'", '').strip()
             if poster:
-                res['thumb'] = poster
+                res['thumb'] = 'http://kinopoisk.ru' + poster
 
-    
-
-        menu = re.compile('<ul id="newMenuSub" class="clearfix(.+?)</ul>', re.U|re.S).search(html)
+        menu = re.compile('<ul id="newMenuSub" class="clearfix(.+?)<!\-\- /menu \-\->', re.U|re.S).search(html)
         if menu:
             menu = menu.group(1)
-            
+
             # фанарт
             if menu.find('/film/' + id + '/wall/') != -1:
                 response = self.http.fetch('http://www.kinopoisk.ru/film/' + id + '/wall/', headers=self.headers)
@@ -772,6 +771,7 @@ class KinoPoisk:
                             r = re.compile('id="image" src="([^"]+)"', re.U|re.S).search(html)
                             if r:
                                 res['fanart'] = r.group(1).strip()
+                                
 
             # если нет фанарта (обоев), то пробуем получить кадры
             if not res['fanart'] and menu.find('/film/' + id + '/stills/') != -1:
@@ -809,7 +809,8 @@ class KinoPoisk:
                                 studio.append(r)
                         if studio:
                             res['info']['studio'] = u', '.join(studio)
-            
+
+
             # трэйлеры
             
             trailers1 = [] # русские трейлеры
@@ -826,7 +827,7 @@ class KinoPoisk:
                         
                         # отсекаем лишние блоки
                         if row.find(u'>СМОТРЕТЬ</a>') != -1:
-                            
+
                             # русский ролик?
                             if row.find('class="flag flag2"') == -1:
                                 is_ru = False
@@ -857,14 +858,20 @@ class KinoPoisk:
                                     r = re.compile(u'clock.gif"[^>]+></td>\s*<td style="color\: #777">[^0-9]*([0-9\:]+)</td>', re.U|re.S).search(row)
                                     if r:
                                         trailer['time'] = r.group(1).strip()
-
+                                    print 'FUCK'
                                     # делим ролики по качеству
                                     for r in re.compile('trailer/([1-3])a.gif"(.+?)link=([^"]+)" class="continue">.+?<td style="color\:#777">([^<]+)</td>\s*</tr>', re.U|re.S).findall(row):
+                                        print str(r)
                                         quality = int(r[0])
                                         if r[1].find('icon-hd') != -1:
                                             quality += 3
                                         
                                         trailer['video'].append((quality, r[2].strip(), r[3]))
+
+                                    print str(trailer)
+                                    if id == '462754':
+                                        #raise
+                                        pass
                                     
                                     if trailer['video']:
                                         if trailer['ru']:
