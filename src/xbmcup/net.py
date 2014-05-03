@@ -744,7 +744,8 @@ class LibTorrent:
                 progress.close()
                 return self._end()
         progress.close()
-        
+
+        xbmcvfs.rename(self._filename, self._filename)        
         if info:
             info['size'] = selfile.size
             xbmc.Player().play(self._filename.encode('utf8'), info)
