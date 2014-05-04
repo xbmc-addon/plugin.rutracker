@@ -514,10 +514,11 @@ class KinoPoisk:
     
     def _search_movie(self, name, year=None):
         url = 'http://www.kinopoisk.ru/s/type/film/list/1/find/' + urllib.quote_plus(name.encode('windows-1251')) + '/order/relevant'
+
         if year:
             url += '/m_act%5Byear%5D/' + str(year)
         url += '/m_act%5Btype%5D/film/'
-        
+
         response = self.http.fetch(url, headers=self.headers)
         if response.error:
             return None
@@ -527,7 +528,7 @@ class KinoPoisk:
         if r:
             for id in re.compile('<p class="name"><a href="/level/1/film/([0-9]+)', re.U|re.S).findall(r.group(1)):
                 res.append(int(id))
-        
+
         return {'pages': (1, 0, 1, 0), 'data': res}
     
         
@@ -657,25 +658,22 @@ class KinoPoisk:
         
         # имя, оригинальное имя, девиз, цензура, год, top250
         # runtime - длительность фильма (в отдельную переменную, иначе не видно размер файла)
-        for tag, reg, t in (
-            ('title', '<title>(.+?)</title>', 'str'),
-            ('originaltitle', 'itemprop="alternativeHeadline">([^<]*)</span>', 'str'),
-            ('tagline', '<td style="color\: #555">&laquo;(.+?)&raquo;</td></tr>', 'str'),
-            ('mpaa', 'images/mpaa/([^\.]+).gif', 'str'),
-            ('runtime', '<td class="time" id="runtime">[^<]+<span style="color\: #999">/</span>([^<]+)</td>', 'str'),
-            ('year', '<a href="/lists/m_act%5Byear%5D/([0-9]+)/"', 'int'),
-            ('top250', 'Топ250\: <a\shref="/level/20/#([0-9]+)', 'int')
+        for tag, reg, cb in (
+            ('title', '<title>(.+?)</title>', self.html.string),
+            ('originaltitle', 'itemprop="alternativeHeadline">([^<]*)</span>', self.html.string),
+            ('tagline', '<td style="color\: #555">&laquo;(.+?)&raquo;</td></tr>', self.html.string),
+            ('mpaa', 'images/mpaa/([^\.]+).gif', self.html.string),
+            ('runtime', '<td class="time" id="runtime">[^<]+<span style="color\: #999">/</span>([^<]+)</td>', self.html.string),
+            ('year', '<a href="/lists/m_act%5Byear%5D/([0-9]+)/"', int),
+            ('top250', 'Топ250\: <a\shref="/level/20/#([0-9]+)', int)
             
             ):
             r = re.compile(reg, re.U).search(html)
             if r:
                 value = r.group(1).strip()
                 if value:
-                    res['info'][tag] = value
-                    if t == 'int':
-                        res['info'][tag] = int(res['info'][tag])
-                    else:
-                        res['info'][tag] = self.html.string(res['info'][tag])
+                    res['info'][tag] = cb(value)
+
         
         # режисеры, сценаристы, жанры
         for tag, reg in (
@@ -858,17 +856,15 @@ class KinoPoisk:
                                     r = re.compile(u'clock.gif"[^>]+></td>\s*<td style="color\: #777">[^0-9]*([0-9\:]+)</td>', re.U|re.S).search(row)
                                     if r:
                                         trailer['time'] = r.group(1).strip()
-                                    print 'FUCK'
+
                                     # делим ролики по качеству
                                     for r in re.compile('trailer/([1-3])a.gif"(.+?)link=([^"]+)" class="continue">.+?<td style="color\:#777">([^<]+)</td>\s*</tr>', re.U|re.S).findall(row):
-                                        print str(r)
                                         quality = int(r[0])
                                         if r[1].find('icon-hd') != -1:
                                             quality += 3
                                         
                                         trailer['video'].append((quality, r[2].strip(), r[3]))
 
-                                    print str(trailer)
                                     if id == '462754':
                                         #raise
                                         pass

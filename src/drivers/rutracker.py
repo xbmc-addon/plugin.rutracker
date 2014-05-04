@@ -146,7 +146,7 @@ class RuTracker:
                 
             Возвращает словарь, аналогичный выводу метода GET
         """
-        
+
         if isinstance(search, unicode):
             search = search.encode('windows-1251')
         
@@ -182,7 +182,7 @@ class RuTracker:
         html = self.http.post('http://rutracker.org/forum/tracker.php', params)
         if not html:
             return html
-        
+
         res = []
         table = re.compile('id="tor\-tbl">(.+?)</table>', re.U|re.S).search(html)
         if table:
@@ -383,7 +383,7 @@ class RuTracker:
                     
                     if is_search:
                         item['comment'] = -1
-                        query = (('download', '<td\sclass="row4\ssmall">([0-9]+)</td>'), ('seeder', '<td\sclass="row4\sseedmed"><b>([0-9]+)</b></td>'), ('leecher', '<td\sclass="row4\sleechmed"[^>]+><b>([0-9]+)</b></td>'))
+                        query = (('download', '<td\sclass="row4\ssmall">([0-9]+)</td>'), ('seeder', '<b class="seedmed">([0-9]+)</b></td>'), ('leecher', '<td\sclass="row4 leechmed"[^>]+><b>([0-9]+)</b></td>'))
                     else:
                         query = (('comment', u'<span title="Ответов">([0-9]+)</span>'), ('download', u'title="Торрент скачан">[^<]*<b>([0-9]+)</b>[^<]*</p>'), ('seeder', 'title="Seeders"><b>([0-9]+)</b></span>'), ('leecher', 'title="Leechers"><b>([0-9]+)</b></span>'))
                     
@@ -442,21 +442,21 @@ class RuTracker:
             'cover': None,
             'screenshot': None
         }
-        
-        r = re.compile('<table class="topic" id="topic_main" cellpadding="0" cellspacing="0">(.+?)<legend>Download</legend>', re.U|re.S).search(html)
+
+        r = re.compile('<div class="post_body"[^>]+>(.+?)<legend>Download</legend>', re.U|re.S).search(html)
         if r:
-            
+
             html = r.group(1)
-            
+
             # ищем коверы (перебирая все возможные варианты хостингов картинок)
             for api in (self.pic_hosting_fastpic, ):
                 cover = api('cover', html)
                 if cover:
                     res['cover'] = cover
                     break
-            
+
             # вытаскиваем блок со скриншотами
-            r = re.compile(u'<h3 class="sp-title">Скриншоты(.+?)</div>', re.U|re.S).search(html)
+            r = re.compile(u'<span>Скриншоты</span></div>(.+?)</div>', re.U|re.S).search(html)
             if r:
                 body = r.group(1)
                 
@@ -466,29 +466,24 @@ class RuTracker:
                     if screenshot:
                         res['screenshot'] = screenshot
                         break
-            
+
             # пытаемся получить текст описания
-            r = re.compile('<div class="post_body"[^>]+>(.+)', re.U|re.S).search(html)
-            if r:
-                html = r.group(1)
-                
-                # режем и заменяем все что можем...
-                for reg, rep in (
-                        
-                        (u'<div class="sp-wrap">.+?</div>', u''), # удаляем все спойлеры
-                        (u'<var[^>]+>[^<]+</var>', u''), # удаляем все изображения
-                        (u'<span class="post\-hr">\-</span>', u'\n'), # удаляем HR
-                        (u'<span class="post\-b">([^<]+)</span>', u'[COLOR FF0DA09E]\g<1>[/COLOR]') # заменяем болды
-                        
-                    ):
-                    html = re.compile(reg, re.U|re.S).sub(rep, html)
-                
-                # прогоняем через полную очистку
-                html = self.html.text(html)
-                if html:
-                    res['descript'] = html
-            
-        
+            # режем и заменяем все что можем...
+            for reg, rep in (
+
+                    (u'<div class="sp\-wrap">.+?<div class="sp-body">.+?</div>', u''), # удаляем все спойлеры
+                    (u'<var[^>]+>[^<]+</var>', u''), # удаляем все изображения
+                    (u'<span class="post\-hr">\-</span>', u'\n'), # удаляем HR
+                    (u'<span class="post\-b">([^<]+)</span>', u'[COLOR FF0DA09E]\g<1>[/COLOR]') # заменяем болды
+
+                ):
+                html = re.compile(reg, re.U|re.S).sub(rep, html)
+
+            # прогоняем через полную очистку
+            html = self.html.text(html)
+            if html:
+                res['descript'] = html
+
         return True, res
     
     

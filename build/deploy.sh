@@ -1,3 +1,4 @@
+#!/bin/sh
 cd `dirname $0`/../src
 
 OLD=`cat ./addon.xml | grep '<addon' | grep 'version="' | grep -E -o 'version="[0-9\.]+"' |  grep -E -o '[0-9\.]+'`
