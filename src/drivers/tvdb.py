@@ -124,7 +124,9 @@ class TvDb:
                 if typeof == float:
                     res['info'][tag] = float(r)
                 elif typeof == list:
-                    res['info'][tag] = u', '.join([x for x in [x.strip() for x in r.split(u'|')] if x])
+                    res['info'][tag] = [x for x in [x.strip() for x in r.split(u'|')] if x]
+                    if tag == 'genre':
+                        res['info'][tag] = u', '.join(res['info'][tag])
                 else:
                     res['info'][tag] = r
         
