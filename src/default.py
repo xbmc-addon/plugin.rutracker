@@ -1750,36 +1750,40 @@ class GuiReview(xbmcgui.WindowXMLDialog):
 
 
 
+def main():
+    plugin = Plugin(Menu)
 
-plugin = Plugin(Menu)
+    plugin.route('menu-rutracker', MenuRutracker)
+    plugin.route('menu-kinopoisk', MenuKinopoisk)
 
-plugin.route('menu-rutracker', MenuRutracker)
-plugin.route('menu-kinopoisk', MenuKinopoisk)
+    plugin.route('rutracker-folder', RutrackerFolder)
+    plugin.route('rutracker-search', RutrackerSearch)
 
-plugin.route('rutracker-folder', RutrackerFolder)
-plugin.route('rutracker-search', RutrackerSearch)
+    plugin.route('kinopoisk-best-query', KinopoiskBestQuery)
+    plugin.route('kinopoisk-best', KinopoiskBest)
+    plugin.route('kinopoisk-search', KinopoiskSearch)
+    plugin.route('kinopoisk-person', KinopoiskPerson)
+    plugin.route('kinopoisk-work', KinopoiskWork)
 
-plugin.route('kinopoisk-best-query', KinopoiskBestQuery)
-plugin.route('kinopoisk-best', KinopoiskBest)
-plugin.route('kinopoisk-search', KinopoiskSearch)
-plugin.route('kinopoisk-person', KinopoiskPerson)
-plugin.route('kinopoisk-work', KinopoiskWork)
+    plugin.route('bookmark', Bookmark)
+    plugin.route('bookmark-add', BookmarkAdd)
 
-plugin.route('bookmark', Bookmark)
-plugin.route('bookmark-add', BookmarkAdd)
+    plugin.route('download', Download)
+    plugin.route('stream', Stream)
 
-plugin.route('download', Download)
-plugin.route('stream', Stream)
+    plugin.route('force-cache', ForceCache)
+    plugin.route('setting', Setting)
+    plugin.route('info', Info)
+    plugin.route('trailer', Trailer)
+    plugin.route('screenshot', Screenshot)
+    plugin.route('status', Status)
+    plugin.route('flush-cache', FlushCache)
+    plugin.route('descript', Descript)
+    plugin.route('comment', Comment)
+    plugin.route('review', Review)
 
-plugin.route('force-cache', ForceCache)
-plugin.route('setting', Setting)
-plugin.route('info', Info)
-plugin.route('trailer', Trailer)
-plugin.route('screenshot', Screenshot)
-plugin.route('status', Status)
-plugin.route('flush-cache', FlushCache)
-plugin.route('descript', Descript)
-plugin.route('comment', Comment)
-plugin.route('review', Review)
+    plugin.run(fanart=True)
 
-plugin.run(fanart=True)
+
+if __name__ == '__main__':
+    main()
