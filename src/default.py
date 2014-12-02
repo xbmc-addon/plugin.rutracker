@@ -1229,11 +1229,11 @@ class Stream(TorrentBase):
 
     def _libtorrent(self):
         # первый запуск
-        buffer = self.path(u'libtorrent')
+        buffer = self.path('libtorrent')
         if not os.path.isdir(buffer):
             os.mkdir(buffer)
             os.chmod(buffer, 0777)
-        buffer = self.path(u'libtorrent', u'buffer')
+        buffer = self.path('libtorrent', 'buffer')
         if not os.path.isdir(buffer):
             os.mkdir(buffer)
             os.chmod(buffer, 0777)
@@ -1244,11 +1244,11 @@ class Stream(TorrentBase):
             buffer = self.setting['libtorrent_dir_buffer'].decode('utf8')
         
         if not buffer:
-            buffer = self.path(u'libtorrent', u'buffer')
+            buffer = self.path('libtorrent', 'buffer')
         
         # проигрываем файл
         if 'file_id' in self.argv:
-            torrent = file(self.path(u'libtorrent', u'buffer.torrent'), 'rb').read()
+            torrent = file(self.path('libtorrent', 'buffer.torrent'), 'rb').read()
             
             if bool(self.setting['libtorrent_seed'] == 'true'):
                 seed = 0
@@ -1292,11 +1292,11 @@ class Stream(TorrentBase):
                 return True
             
             # чистим кэш
-            if os.path.isfile(self.path(u'libtorrent', u'buffer.torrent')) and torrent != file(self.path(u'libtorrent', u'buffer.torrent'), 'rb').read():
+            if os.path.isfile(self.path('libtorrent', 'buffer.torrent')) and torrent != file(self.path('libtorrent', 'buffer.torrent'), 'rb').read():
                 self._clear(buffer)
             
             # кэшируем торрент
-            file(self.path(u'libtorrent', u'buffer.torrent'), 'wb').write(torrent)
+            file(self.path('libtorrent', 'buffer.torrent'), 'wb').write(torrent)
             
             total = len(filelist)
             
