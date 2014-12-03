@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os
+import urllib
 import re
 import cookielib
 
@@ -21,7 +21,8 @@ class RuTracker:
         
         self.re = {
             'is_int': re.compile(r'^([0-9]+)', re.U),
-            'is_float': re.compile(r'^([0-9]{1,10}\.[0-9]+)', re.U)
+            'is_float': re.compile(r'^([0-9]{1,10}\.[0-9]+)', re.U),
+            'hash': re.compile(r'<span id="tor-hash">([0-9A-F]{40})</span>', re.U)
         }
         
         self.html = Clear()
@@ -163,21 +164,21 @@ class RuTracker:
             if index is not None:
                 if not isinstance(index, list) and not isinstance(index, tuple):
                     index = [index]
-            
-            if not isinstance(ignore, list) and not isinstance(ignore, tuple):
-                ignore = [ignore]
-            
+            if ignore is not None:
+                if not isinstance(ignore, list) and not isinstance(ignore, tuple):
+                    ignore = [ignore]
             if not index and not ignore:
                 folder = []
             else:
                 folder = self._load_catalog(index, ignore)
                 if not folder:
                     return folder
-        
+
+
         # готовим запрос
         params = [('nm', search), ('o', 10), ('s', 2), ('prev_my', 0), ('prev_new', 0), ('prev_oop', 0), ('submit', r'Поиск')]
         params.extend([('f[]', x) for x in folder])
-        
+
         # делаем поиск
         html = self.http.post('http://rutracker.org/forum/tracker.php', params)
         if not html:
@@ -340,6 +341,33 @@ class RuTracker:
             Возвращает торрент или None (в случае неудачи)
         """
         return self.http.download(id)
+
+
+    def hash(self, id):
+        """
+            Получение инфо-хеша раздачи
+
+            На вход функции надо подавать следующие параметры:
+                id        - [str] топика с раздачей
+
+            Возвращает шеснадцатеричное число хэша (в виде строки) или None (в случае неудачи)
+        """
+        return self.cache_profile.get('hash:' + str(id), self._hash, id)
+
+
+    def magnet(self, id):
+        """
+            Получение инфо-хеша раздачи
+
+            На вход функции надо подавать следующие параметры:
+                id        - [str] топика с раздачей
+
+            Возвращает шеснадцатеричное число хэша (в виде строки) или None (в случае неудачи)
+        """
+        hash = self.hash(id)
+        if hash:
+            return 'magnet:?xt=urn:btih:' + hash
+        return hash
         
     
     
@@ -430,7 +458,15 @@ class RuTracker:
                 return prefix*int(num.group(1))
             
         return None
-    
+
+    def _hash(self, id):
+        html = self.http.get('http://rutracker.org/forum/viewtopic.php?t=' + str(id))
+        if not html:
+            return False, html
+        r = self.re['hash'].search(html)
+        if not r:
+            return False, None
+        return True, str(r.group(1))
     
     def _profile(self, id):
         html = self.http.guest('http://rutracker.org/forum/viewtopic.php?t=' + str(id))
