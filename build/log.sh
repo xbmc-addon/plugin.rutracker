@@ -1,2 +1,2 @@
 #!/bin/sh
-cat $HOME/Library/Logs/xbmc.log
+cat $HOME/Library/Logs/kodi.log
