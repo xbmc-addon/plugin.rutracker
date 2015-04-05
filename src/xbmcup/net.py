@@ -663,6 +663,164 @@ class Transmission:
 #
 # ################################
 
+
+class LibTorrentInfo:
+    def __init__(self):
+
+        self.lang = self._language()
+
+        self.is_show = False
+        self.window = xbmcgui.Window(12005)
+        self.info = {}
+
+        # get resolution
+        # https://github.com/steeve/xbmctorrent/blob/master/resources/site-packages/xbmctorrent/player.py#L90
+        import xml.etree.ElementTree as ET
+        res = ET.parse(os.path.join(xbmc.translatePath('special://skin/'), 'addon.xml')).findall('./extension/res')[0]
+        self._width = int(res.attrib['width'])
+        self._height = int(res.attrib['height'])
+
+        black = os.path.normpath(os.path.join(os.path.dirname(__file__), '../resources/media/black.jpg'))
+        white = os.path.normpath(os.path.join(os.path.dirname(__file__), '../resources/media/white.jpg'))
+
+        self.label = xbmcgui.ControlLabel(self.width(40), self.height(23) + 4, self.width(55), self.height(6), ' ', textColor='0xAAFFFFFF', alignment=5)
+
+        self.controls = [
+            xbmcgui.ControlImage(0, self.height(20), self.width(100), self.height(37), black, colorDiffuse='0xDD000000'),
+            xbmcgui.ControlImage(0, self.height(31), self.width(100), 1, white, colorDiffuse='0x22FFFFFF'),
+            xbmcgui.ControlLabel(self.width(5), self.height(23), self.width(25), self.height(6), '[B]LibTorrent Player[/B]', font='font16', textColor='0xAAFFFFFF'),
+            self.label
+        ]
+
+        self.progress = {}
+        self.percent = {}
+        self.bytes = {}
+
+        for i, tag in enumerate(('file', 'total')):
+            self.controls.append(xbmcgui.ControlLabel(self.width(5), self.height(34) + self.height(11)*i, self.width(25), self.height(6), self.lang['label_' + tag], textColor='0xAAFFFFFF', alignment=4))
+            self.controls.append(xbmcgui.ControlImage(self.width(5), self.height(40) + self.height(11)*i, self.width(90), self.height(2), white, colorDiffuse='0x22FFFFFF'))
+
+            self.bytes[tag] = xbmcgui.ControlLabel(self.width(37), self.height(34) + self.height(11)*i, self.width(50), self.height(6), ' ', textColor='0xAAFFFFFF', alignment=5)
+            self.controls.append(self.bytes[tag])
+
+            self.percent[tag] = xbmcgui.ControlLabel(self.width(88), self.height(34) + self.height(11)*i, self.width(7), self.height(6), '[B]0%[/B]', font='font16', textColor='0xAAFFFFFF', alignment=5)
+            self.controls.append(self.percent[tag])
+
+            self.progress[tag] = xbmcgui.ControlImage(self.width(5), self.height(40) + self.height(11)*i, 0, self.height(2), white, colorDiffuse='0x77FFFFFF')
+            self.controls.append(self.progress[tag])
+
+
+    def show(self):
+        if self.width and not self.is_show:
+            self.window.addControls(self.controls)
+            self.is_show = True
+
+
+    def hide(self):
+        if self.is_show:
+            try:
+                self.window.removeControls(self.controls)
+            except RuntimeError:
+                pass
+            self.is_show = False
+
+
+    def update(self, state, peers, seeds, down_speed, up_speed, download, size, total_download, total_size):
+        if state in ('init', 'stop'):
+            self.label.setLabel(self.lang[state])
+        else:
+            speed = self.human(up_speed if state == 'seed' else down_speed, True)
+            self.label.setLabel(self.lang['status'] % (seeds, peers, speed, self.lang[state]))
+
+            for tag, b, s in (('file', download, size), ('total', total_download, total_size)):
+                percent = self.calc_percent(b, s)
+                self.bytes[tag].setLabel(u' / '.join([self.human(b, False), self.human(s, False)]))
+                self.percent[tag].setLabel(u'[B]' + str(percent) + u'%[/B]')
+                self.progress[tag].setWidth(self.width(0.85*float(percent)))
+
+
+
+    def update2(self, state, peers, seeds, dspeed, uspeed, filename, download, size, rbuffer, tdownload, tupload, tsize, tbuffer):
+        if state in ('init', 'stop'):
+            self.label.setLabel(self.lang[state])
+        else:
+
+            if state == 'seed':
+                speed = self.human(uspeed, True)
+            else:
+                speed = self.human(dspeed, True)
+
+            self.label.setLabel(self.lang['status'] % (seeds, peers, speed, self.lang[state]))
+
+            for tag, b, s in (('buffer', rbuffer, tbuffer), ('file', download, size), ('total', tdownload, tsize)):
+                percent = self.calc_percent(b, s)
+                self.bytes[tag].setLabel(u' / '.join([self.human(b, False), self.human(s, False)]))
+                self.percent[tag].setLabel(u'[B]' + str(percent) + u'%[/B]')
+                #self.progress[tag].setWidth(18*percent)
+
+    def human(self, bytes, is_bit):
+        tags = ('kbit', 'mbit', 'gbit', 'tbit') if is_bit else ('kb', 'mb', 'gb', 'tb')
+        human = None
+        for h, f in ((tags[0], 1024), (tags[1], 1024*1024), (tags[2], 1024*1024*1024), (tags[3], 1024*1024*1024*1024)):
+            if bytes/f > 0:
+                human = h
+                factor = f
+            else:
+                break
+        if human is None:
+            return (u'%10.1f %s' % (bytes, self.lang[tags[0]])).replace(u'.0', u'').strip()
+        else:
+            return (u'%10.2f %s' % (float(bytes)/float(factor), self.lang[human])).strip()
+
+
+    def calc_percent(self, num, total):
+        if not total:
+            return 0
+        r = int(float(num)*100.0/float(total))
+        return 100 if r > 100 else r
+
+    def width(self, percent):
+        return int(self._width*(float(percent)/100.0))
+
+    def height(self, percent):
+        return int(self._height*(float(percent)/100.0))
+
+    def _language(self):
+        tags = dict(
+            status = 100000,
+
+            init   = 100001,
+            buffer = 100002,
+            down   = 100003,
+            up     = 100004,
+            seed   = 100005,
+            stop   = 100006,
+            copy   = 100007,
+
+            label_buffer = 100031,
+            label_file   = 100032,
+            label_total  = 100033,
+
+            b  = 100100,
+            kb = 100101,
+            mb = 100102,
+            gb = 100103,
+            tb = 100104,
+
+            bit  = 100200,
+            kbit = 100201,
+            mbit = 100202,
+            gbit = 100203,
+            tbit = 100204
+        )
+        addon = xbmcaddon.Addon('plugin.rutracker')
+        lang = {}
+        for tag, key in tags.iteritems():
+            lang[tag] = addon.getLocalizedString(key)
+        return lang
+
+
+
 class LibTorrent:
     def __init__(self):
         self.is_install = _IS_LIBTORRENT    
@@ -751,11 +909,22 @@ class LibTorrent:
             xbmc.Player().play(self._filename.encode('utf8'), info)
         else:
             xbmc.Player().play(self._filename.encode('utf8'))
-        
+
+        window_info = LibTorrentInfo()
+
         while xbmc.Player().isPlaying():
+
+            if xbmc.getCondVisibility('Player.Paused'):
+                window_info.show()
+            else:
+                window_info.hide()
+
+            window_info.update(**self._get_state(file_id, selfile.size))
+
             if not self._complete:
                 priorities = self._handle.piece_priorities()
                 status = self._handle.status()
+
                 download = 0
                 
                 if len(status.pieces):
@@ -784,8 +953,59 @@ class LibTorrent:
                                 xbmc.executebuiltin('XBMC.Notification("%s", "%s", %s)' % ('Download complete', self._fname, 5000))
             
             time.sleep(1)
+
+        window_info.hide()
         
         return self._end()
+
+
+    def _get_state(self, fid, size):
+        res = dict(
+            state='init',
+            peers=0,
+            seeds=0,
+            down_speed=0,
+            up_speed=0,
+            total_download=0,
+            total_size=0
+        )
+
+        try:
+            info = self._handle.get_torrent_info()
+        except RuntimeError:
+            pass
+        else:
+            states = {
+                'queued_for_checking': 'init',
+                'checking_files': 'init',
+                'downloading_metadata': 'down',
+                'downloading': 'down',
+                'seeding': 'seed',
+                'allocating': 'init',
+                'checking_resume_data': 'init'
+            }
+
+            progress = self._handle.file_progress()
+            status = self._handle.status()
+            state = str(status.state)
+
+            if state == 'finished':
+                res['state'] = 'seed' if status.is_seeding else 'down'
+            else:
+                res['state'] = states.get(state, 'init')
+
+            res['peers'] = status.num_peers
+            res['seeds'] = status.num_seeds
+            res['down_speed'] = status.download_payload_rate
+            res['up_speed'] = status.upload_payload_rate
+
+            res['download'] = progress[fid]
+            res['size'] = size
+
+            res['total_download'] = sum(progress)
+            res['total_size'] = info.total_size() if self._handle.has_metadata else 0
+
+        return res
     
     
     def _end(self):

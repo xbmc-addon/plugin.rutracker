@@ -187,5 +187,30 @@
 	<string id="90012">Отрицательные</string>
 	<string id="90013">Нейтральные</string>
 	<string id="90014">Все рецензии</string>
+
+    <string id="100000">Сиды:  %s      Пиры:  %s      Скорость:  %s            %s</string>
+    <string id="100001">Инициализация</string>
+    <string id="100002">Буферизация</string>
+    <string id="100003">Скачиваем</string>
+    <string id="100004">Раздаем</string>
+    <string id="100005">Сидируем</string>
+    <string id="100006">Останавливаем</string>
+    <string id="100007">Копируем</string>
+
+    <string id="100031">Буфер</string>
+    <string id="100032">Файл</string>
+    <string id="100033">Раздача</string>
+
+    <string id="100100">байт</string>
+    <string id="100101">Кбайт</string>
+    <string id="100102">Мбайт</string>
+    <string id="100103">Гбайт</string>
+    <string id="100104">Тбайт</string>
+
+    <string id="100200">бит/сек</string>
+    <string id="100201">Кбит/сек</string>
+    <string id="100202">Мбит/сек</string>
+    <string id="100203">Гбит/сек</string>
+    <string id="100204">Тбит/сек</string>
 	
 </strings>
