@@ -187,5 +187,30 @@
 	<string id="90012">Negative</string>
 	<string id="90013">Neutral</string>
 	<string id="90014">All reviews</string>
+
+    <string id="100000">Seeds:  %s      Peers:  %s      Speed:  %s            %s</string>
+    <string id="100001">Initialization</string>
+    <string id="100002">Buffering</string>
+    <string id="100003">Downloading</string>
+    <string id="100004">Uploading</string>
+    <string id="100005">Seeding</string>
+    <string id="100006">Stopping</string>
+    <string id="100007">Copying</string>
+
+    <string id="100031">Buffer</string>
+    <string id="100032">File</string>
+    <string id="100033">Total</string>
+
+    <string id="100100">byte</string>
+    <string id="100101">KB</string>
+    <string id="100102">MB</string>
+    <string id="100103">GB</string>
+    <string id="100104">TB</string>
+
+    <string id="100200">bit/sec</string>
+    <string id="100201">Kbit/sec</string>
+    <string id="100202">Mbit/sec</string>
+    <string id="100203">Gbit/sec</string>
+    <string id="100204">Tbit/sec</string>
 	
 </strings>

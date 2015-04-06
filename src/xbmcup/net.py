@@ -671,7 +671,6 @@ class LibTorrentInfo:
 
         self.is_show = False
         self.window = xbmcgui.Window(12005)
-        self.info = {}
 
         # get resolution
         # https://github.com/steeve/xbmctorrent/blob/master/resources/site-packages/xbmctorrent/player.py#L90
@@ -739,25 +738,6 @@ class LibTorrentInfo:
                 self.progress[tag].setWidth(self.width(0.85*float(percent)))
 
 
-
-    def update2(self, state, peers, seeds, dspeed, uspeed, filename, download, size, rbuffer, tdownload, tupload, tsize, tbuffer):
-        if state in ('init', 'stop'):
-            self.label.setLabel(self.lang[state])
-        else:
-
-            if state == 'seed':
-                speed = self.human(uspeed, True)
-            else:
-                speed = self.human(dspeed, True)
-
-            self.label.setLabel(self.lang['status'] % (seeds, peers, speed, self.lang[state]))
-
-            for tag, b, s in (('buffer', rbuffer, tbuffer), ('file', download, size), ('total', tdownload, tsize)):
-                percent = self.calc_percent(b, s)
-                self.bytes[tag].setLabel(u' / '.join([self.human(b, False), self.human(s, False)]))
-                self.percent[tag].setLabel(u'[B]' + str(percent) + u'%[/B]')
-                #self.progress[tag].setWidth(18*percent)
-
     def human(self, bytes, is_bit):
         tags = ('kbit', 'mbit', 'gbit', 'tbit') if is_bit else ('kb', 'mb', 'gb', 'tb')
         human = None
@@ -776,6 +756,8 @@ class LibTorrentInfo:
     def calc_percent(self, num, total):
         if not total:
             return 0
+        if num == total:
+            return 100
         r = int(float(num)*100.0/float(total))
         return 100 if r > 100 else r
 
