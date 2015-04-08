@@ -978,8 +978,8 @@ class LibTorrent:
 
             res['peers'] = status.num_peers
             res['seeds'] = status.num_seeds
-            res['down_speed'] = status.download_payload_rate
-            res['up_speed'] = status.upload_payload_rate
+            res['down_speed'] = 8*status.download_payload_rate  # 8*byte
+            res['up_speed'] = 8*status.upload_payload_rate  # 8*byte
 
             res['download'] = progress[fid]
             res['size'] = size
