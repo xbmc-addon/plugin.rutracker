@@ -63,6 +63,15 @@ CONTENT = {
     'stream': True
 },
 
+'sport': {
+    'index': (255, 1608, 2004, 2009, 845),
+    'ignore': (261, 1609, 1999, 2000, 2312, 1476),
+    'media': 'video',
+    'scraper': None,
+    'rating': False,
+    'stream': True
+},
+
 'training': {
     'index': (610, 1581, 1556),
     'ignore': (628, 1582, 1583, 1557),
@@ -71,8 +80,6 @@ CONTENT = {
     'rating': False,
     'stream': True
 }
-
-
 
 }
 
@@ -416,6 +423,7 @@ class MenuRutracker(Handler):
         self.item(Link('rutracker-folder', {'content': 'series'}), title=u'Сериалы')
         self.item(Link('rutracker-folder', {'content': 'cartoon'}), title=u'Мультипликация')
         self.item(Link('rutracker-folder', {'content': 'documentary'}), title=u'Документалистика и юмор')
+        self.item(Link('rutracker-folder', {'content': 'sport'}), title=u'Спорт')
         self.item(Link('rutracker-folder', {'content': 'training'}), title=u'Обучающее видео')
 
 class MenuKinopoisk(Handler):
@@ -442,7 +450,7 @@ class RutrackerBase(Handler, Scrapers):
             err = 30001
         elif data == 0:
             err = 30002
-        
+
         if err:
             lang = self.lang[err].split('|')
             xbmcgui.Dialog().ok('RuTracker', lang[0], lang[1])
@@ -951,6 +959,7 @@ class Bookmark(Handler, TrailerParser):
             xbmcgui.Dialog().ok('RuTracker', self.lang[30021])
         
         kinopoisk = KinoPoisk()
+        tvdb = TvDb()
         
         data = bookmark.get()
         if not data:
@@ -961,7 +970,7 @@ class Bookmark(Handler, TrailerParser):
             fanart_view = bool(self.setting['rutracker_fanart'] == 'true')
             
             total = len(data)
-            
+
             for d in data:
                 
                 # общий для всех popup (Info)
@@ -1005,6 +1014,37 @@ class Bookmark(Handler, TrailerParser):
                     
                     # вывод
                     self.item(Link('rutracker-search', {'content': 'movie', 'search': search}), title=movie['info']['title'], thumb=movie['thumb'], media='video', info=movie['info'], fanart=movie['fanart'], popup=popup, popup_replace=True, total=total)
+
+                elif d['scrapper'] == 'tvdb':
+
+                    movie = tvdb.movie(d['id'])
+
+                    # удалить из закладок
+                    popup.append( (Link('bookmark', {'scrapper': d['scrapper'], 'id': d['id']}), self.lang[40010], True, True) )
+
+                    # настройки плагина
+                    popup.append( (Link('setting'), self.lang[40015]) )
+
+                    # имя для поиска на RuTracker
+                    search = movie['info']['title']
+                    if movie['info'].get('originaltitle'):
+                        search = movie['info']['originaltitle']
+
+                    # если фанарт выключен принудительно, то отключаем его
+                    if not fanart_view:
+                        movie['fanart'] = None
+
+                    # выставляем рейтинг в наименование
+                    if rating_view:
+                        rating = u'%1.1f' % movie['info'].get('rating', 0.0)
+                        if rating == u'0.0':
+                            rating = u'[COLOR 22FFFFFF]0.0[/COLOR]'
+                        elif rating == u'10.0':
+                            rating = u'[B]10[/B]'
+                        movie['info']['title'] = rating + u'  ' + movie['info']['title']
+
+                    # вывод
+                    self.item(Link('rutracker-search', {'content': 'series', 'search': search}), title=movie['info']['title'], thumb=movie['thumb'], media='video', info=movie['info'], fanart=movie['fanart'], popup=popup, popup_replace=True, total=total)
                 
                 else:
                     # TODO - для других скраперов

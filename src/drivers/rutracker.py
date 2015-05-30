@@ -83,11 +83,11 @@ class RuTracker:
                 return html
             
             res = []
-            
-            r = re.compile(r'<div\sid="forums_wrap">(.+)<div\sid="board_stats">', re.U|re.S).search(html)
+
+            r = re.compile(r'<div\sid="forums_wrap">(.+)<div\sclass="bottom_info">', re.U|re.S).search(html)
             if r:
                 
-                r = re.compile(r'<h4\sclass="forumlink"><a\shref="\./viewforum\.php\?f=([0-9]+)">(.+?)</a></h4>', re.U|re.S).findall(r.group(1))
+                r = re.compile(r'<h4\sclass="forumlink"><a\shref="viewforum\.php\?f=([0-9]+)">(.+?)</a></h4>', re.U|re.S).findall(r.group(1))
                 if r:
                     res = [{'id': int(i), 'name': self.html.string(x), 'type': 'folder'} for i, x in r]
             
@@ -96,7 +96,6 @@ class RuTracker:
             return {'pages': (1, 0, 1, 0), 'data': res}
         
         else:
-            
             page_query = ''
             if page > 1:
                 page_query = '&start=' + str(50*(page-1))
@@ -118,7 +117,7 @@ class RuTracker:
                     r = re.compile(r'<h4\sclass="forumlink"><a\shref="viewforum\.php\?f=([0-9]+)">(.+?)</a></h4>', re.U|re.S).findall(group)
                     if r:
                         folder.extend([{'id': int(i), 'name': self.html.string(x), 'type': 'folder'} for i, x in r])
-                    
+
                     # нарубаем на строчки топиков
                     topic_list = group.split(u'topicSep">')
                     if len(topic_list) > 1:
@@ -131,6 +130,7 @@ class RuTracker:
                             item = self._compile_topic(text)
                             if item:
                                 torrent.append(item)
+
             
             folder.extend(torrent)
             
@@ -385,10 +385,11 @@ class RuTracker:
         return 1, 0, 1, 0
     
     def _compile_topic(self, text, is_search=False):
-        r = re.compile(r'<a\s[^>]*href="\./viewtopic\.php\?t=([0-9]+)"[^>]*>(.+?)</a>', re.U|re.S).search(text)
+        r = re.compile(r'<a\s[^>]*href="viewtopic\.php\?t=([0-9]+)"[^>]*>(.+?)</a>', re.U|re.S).search(text)
         if r:
             id = r.group(1)
             name = self.html.string(r.group(2))
+
             r = re.compile(r'<a[^>]+href="http://dl\.rutracker\.org/forum/dl\.php\?t=' + id + '"[^>]*>(.+?)</a>', re.U|re.S).search(text)
             if r:
                 size = self._compile_size(r.group(1))
@@ -577,7 +578,7 @@ class RuTracker:
 class RuTrackerHTTP:
     def __init__(self):
         self.setting = Setting()
-        self.re_auth = re.compile(r'"profile\.php\?mode=sendpassword"')
+        self.re_auth = re.compile(r'profile\.php\?mode=sendpassword"')
         self.http = HTTP()
         
         self.headers = {
@@ -675,4 +676,3 @@ class RuTrackerHTTP:
             return None, None
         else:
             return login2, password2
-        
