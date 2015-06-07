@@ -822,7 +822,7 @@ class LibTorrent:
         selfile = torrent_info.files()[file_id]
         self._filename = os.path.join(dirname, selfile.path.decode('utf8'))
         self._fname = self._filename.split(os.sep.decode('utf8'))[-1].encode('utf8')
-        offset = (buffer+10)*1024*1024 / torrent_info.piece_length()
+        offset = (buffer+20)*1024*1024 / torrent_info.piece_length()
         start = selfile.offset / torrent_info.piece_length()
         end = (selfile.offset + selfile.size) / torrent_info.piece_length()
         buffer = buffer*1024*1024
