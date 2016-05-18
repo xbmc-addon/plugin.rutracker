@@ -390,7 +390,7 @@ class RuTracker:
             id = r.group(1)
             name = self.html.string(r.group(2))
 
-            r = re.compile(r'<a[^>]+href="http://dl\.rutracker\.org/forum/dl\.php\?t=' + id + '"[^>]*>(.+?)</a>', re.U|re.S).search(text)
+            r = re.compile(r'<a[^>]+href="dl\.php\?t=' + id + '"[^>]*>(.+?)</a>', re.U|re.S).search(text)
             if r:
                 size = self._compile_size(r.group(1))
                 if size and name:
