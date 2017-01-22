@@ -332,7 +332,7 @@ class KinoPoisk:
         
         if trailer_quality is None:
             trailer_quality = 6
-        
+
         movie = self.cache.get('movie:' + id, self._movie, id)
         if not movie:
             return None

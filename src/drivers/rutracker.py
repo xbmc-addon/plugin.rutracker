@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import urllib
 import re
 import cookielib
 
@@ -10,6 +9,7 @@ from xbmcup.cache import Cache
 from xbmcup.html import Clear
 
 import xbmc
+import xbmcgui
 
 class RuTracker:
     def __init__(self, expire=0, size=0):
@@ -579,10 +579,16 @@ class RuTrackerHTTP:
     def __init__(self):
         self.setting = Setting()
         self.re_auth = re.compile(r'profile\.php\?mode=sendpassword"')
+        self.re_captcha = re.compile(r'<img src="(\/\/[^\/]+/captcha/[^"]+)"')
+        self.re_captcha_sid = re.compile(r'<input type="hidden" name="cap_sid" value="([^"]+)">')
+        self.re_captcha_code = re.compile(r'<input type="text" name="(cap_code_[^"]+)"')
+        self.captcha_sid = None
+        self.captcha_code = None
+        self.captcha_code_value = None
         self.http = HTTP()
         
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:10.0.2) Gecko/20100101 Firefox/10.0.2',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3',
             'Cache-Control': 'no-cache',
@@ -607,20 +613,20 @@ class RuTrackerHTTP:
     
     def download(self, id):
         id = str(id)
-        
+
         # проверяем авторизацию
         html = self.get('http://rutracker.cr/forum/viewtopic.php?t=' + id)
         if not html:
             return html
-        
+
         # хакаем куки
         cookies = cookielib.MozillaCookieJar()
         cookies.load(self.http.request.cookies)
         cookies.set_cookie(cookielib.Cookie(version=0, name='bb_dl', value=id, port=None, port_specified=False, domain='.rutracker.cr', domain_specified=False, domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=True, comment=None, comment_url=None, rest={'HttpOnly': None}, rfc2109=False))
         cookies.save(self.http.request.cookies, ignore_discard=True, ignore_expires=True)
-        
+
         # тянем торрент
-        response = self.http.fetch('http://dl.rutracker.cr/forum/dl.php?t=' + id, cookies='rutracker.moz', headers=self.headers, method='POST')
+        response = self.http.fetch('http://rutracker.cr/forum/dl.php?t=' + id, cookies='rutracker.moz', headers=self.headers, method='POST')
         if response.error:
             return None
         else:
@@ -638,41 +644,96 @@ class RuTrackerHTTP:
                     return 0
                 if not self.re_auth.search(body):
                     return body
-                else:
-                    xbmc.log('RUTRACKER: Request auth', xbmc.LOGDEBUG)
-                    auth = self._auth()
-                    if not auth:
-                        return auth
+                xbmc.log('RUTRACKER: Request auth', xbmc.LOGDEBUG)
+                auth = self._auth()
+                if not auth:
+                    return auth
         
     def _auth(self):
+        self.captcha_sid, self.captcha_code, self.captcha_code_value = None, None, None
         while True:
             login = self.setting['rutracker_login']
             password = self.setting['rutracker_password']
             if not login or not password:
-                login, password = self._setting(login, password)
-                if not login:
-                    return False
-            
-            response = self.http.fetch('http://login.rutracker.cr/forum/login.php', cookies='rutracker.moz', headers=self.headers, method='POST', params={'login_username': login, 'login_password': password, 'login': r'Вход'})
+                self.setting.dialog()
+                login = self.setting['rutracker_login']
+                password = self.setting['rutracker_password']
+                if not login or not password:
+                    return None
+
+            params = {'login_username': login, 'login_password': password, 'login': r'вход'}
+            if self.captcha_sid:
+                params['login'] = r'Вход'
+                params['cap_sid'] = self.captcha_sid
+                params[self.captcha_code] = self.captcha_code_value
+
+            response = self.http.fetch('http://rutracker.cr/forum/login.php', cookies='rutracker.moz', headers=self.headers, method='POST', params=params)
+            self.captcha_sid, self.captcha_code, self.captcha_code_value = None, None, None
             if response.error:
-                return False
+                return None
+
+            body = response.body.decode('windows-1251')
+
+            if body.find(u'>форум временно отключен</p>') != -1:
+                return 0
+
+            if not self.re_auth.search(body):
+                return True
+
+            # проверяем капчу
+            r = self.re_captcha.search(body)
+            if r:
+                r_sid = self.re_captcha_sid.search(body)
+                if not r_sid:
+                    return None
+                self.captcha_sid = r_sid.group(1)
+                r_code = self.re_captcha_code.search(body)
+                if not r_code:
+                    return None
+                self.captcha_code = r_code.group(1)
+                self.captcha_code_value = self._captcha('http:' + r.group(1))
+                if not self.captcha_code_value:
+                    return None
+
+            # get login
+            k = xbmc.Keyboard('', 'Enter login')
+            k.doModal()
+            if k.isConfirmed():
+                login = k.getText()
             else:
-                body = response.body.decode('windows-1251')
-                if body.find(u'>форум временно отключен</p>') != -1:
-                    return 0
-                if not self.re_auth.search(body):
-                    return True
-                else:
-                    login, password = self._setting(login, password)
-                    if not login:
-                        return False
-            
-    
-    def _setting(self, login, password):
-        self.setting.dialog()
-        login2 = self.setting['rutracker_login']
-        password2 = self.setting['rutracker_password']
-        if login == login2 and password == password2:
-            return None, None
-        else:
-            return login2, password2
+                return None
+
+            # get password
+            k = xbmc.Keyboard('', 'Enter password', True)
+            k.doModal()
+            if k.isConfirmed():
+                password = k.getText()
+            else:
+                return None
+
+            if not login or not password:
+                return None
+
+            self.setting['rutracker_login'] = login
+            self.setting['rutracker_password'] = password
+
+
+    def _captcha(self, captcha):
+        response = self.http.fetch(captcha, headers=self.headers, method='GET')
+        if response.error:
+            return
+
+        import tempfile
+        filename = tempfile.gettempdir() + '/captcha'
+        file(filename, 'wb').write(response.body)
+
+        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+
+        # width = 120px, height = 72px
+        image = xbmcgui.ControlImage(win.getWidth()/2 - int(120/2), 20, 120, 72, filename)
+        win.addControl(image)
+        k = xbmc.Keyboard('', 'Enter captcha code')
+        k.doModal()
+        code = k.getText() if k.isConfirmed() else None
+        win.removeControl(image)
+        return code if code else None

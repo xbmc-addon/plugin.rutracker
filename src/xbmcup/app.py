@@ -244,6 +244,7 @@ class Setting(object):
         self._addon.setSetting(id=key, value=value)
     
     def dialog(self):
+        self._cache = {}
         self._addon.openSettings()
 
 

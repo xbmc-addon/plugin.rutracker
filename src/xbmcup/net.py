@@ -12,7 +12,6 @@ import mimetools
 import json
 import itertools
 import thread
-import tempfile
 
 try:
     import libtorrent
@@ -885,23 +884,19 @@ class LibTorrent:
                 return self._end()
         progress.close()
 
-        xbmcvfs.rename(self._filename, self._filename)        
+        from kls import KLS
+        status = KLS('LibTorrent')
+        status.dialog.create()
+
+        xbmcvfs.rename(self._filename, self._filename)
         if info:
             info['size'] = selfile.size
             xbmc.Player().play(self._filename.encode('utf8'), info)
         else:
             xbmc.Player().play(self._filename.encode('utf8'))
 
-        window_info = LibTorrentInfo()
-
         while xbmc.Player().isPlaying():
 
-            if xbmc.getCondVisibility('Player.Paused'):
-                window_info.show()
-            else:
-                window_info.hide()
-
-            window_info.update(**self._get_state(file_id, selfile.size))
 
             if not self._complete:
                 priorities = self._handle.piece_priorities()
@@ -936,8 +931,6 @@ class LibTorrent:
             
             time.sleep(1)
 
-        window_info.hide()
-        
         return self._end()
 
 
