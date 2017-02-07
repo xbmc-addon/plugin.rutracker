@@ -15,8 +15,14 @@ import thread
 
 try:
     import libtorrent
-except ImportError:
-    _IS_LIBTORRENT = False
+except ImportError, e:
+    try:
+        from python_libtorrent import get_libtorrent
+        libtorrent=get_libtorrent()
+    except Exception, e:
+        _IS_LIBTORRENT = False
+    else:
+        _IS_LIBTORRENT = True
 else:
     _IS_LIBTORRENT = True
 
@@ -807,7 +813,8 @@ class LibTorrent:
         self.is_install = _IS_LIBTORRENT    
     
     def list(self, torrent, reverse=False):
-        files = [{'id': i, 'name': x.path.split(os.sep)[-1], 'size': x.size} for i, x in enumerate(self._torrent_info(torrent).files())]
+        file_storage = self._torrent_info(torrent).files()
+        files = [{'id': i, 'name': file_storage.file_path(i).split(os.sep)[-1], 'size': file_storage.file_size(i)} for i in range(file_storage.num_files())]
         files.sort(cmp=lambda f1, f2: cmp(f1['name'], f2['name']))
         if reverse:
             files.reverse()
@@ -818,12 +825,13 @@ class LibTorrent:
         torrent_info = self._torrent_info(torrent)
         
         # length
-        selfile = torrent_info.files()[file_id]
-        self._filename = os.path.join(dirname, selfile.path.decode('utf8'))
+        file_storage = torrent_info.files()
+        size = file_storage.file_size(file_id)
+        self._filename = os.path.join(dirname, file_storage.file_path(file_id).decode('utf8'))
         self._fname = self._filename.split(os.sep.decode('utf8'))[-1].encode('utf8')
         offset = (buffer+20)*1024*1024 / torrent_info.piece_length()
-        start = selfile.offset / torrent_info.piece_length()
-        end = (selfile.offset + selfile.size) / torrent_info.piece_length()
+        start = file_storage.file_offset(file_id) / torrent_info.piece_length()
+        end = (file_storage.file_offset(file_id) + size) / torrent_info.piece_length()
         buffer = buffer*1024*1024
         
         # start session
@@ -866,36 +874,39 @@ class LibTorrent:
         thread.start_new_thread(self._download, (start, end))
         
         percent = 0
-        size = 0
-        firstsize = selfile.size if selfile.size < buffer else buffer
+        firstsize = size if size < buffer else buffer
         persize = firstsize/100
         
         progress = xbmcgui.DialogProgress()
         progress.create(u'Please Wait')
-        progress.update(0, self._fname, u'Size: ' + self._human(firstsize) + u' / ' + self._human(selfile.size).strip(), u'Load: ' + self._human(0))
+        progress.update(0, self._fname, u'Size: ' + self._human(firstsize) + u' / ' + self._human(size).strip(), u'Load: ' + self._human(0))
         
         while percent < 100:
             time.sleep(1)
-            size = self._handle.file_progress()[file_id]
-            percent = int(size/persize)
-            progress.update(percent, self._fname, u'Size: ' + self._human(firstsize) + u' / ' + self._human(selfile.size).strip(), u'Load: ' + self._human(size))
+            load = self._handle.file_progress()[file_id]
+            percent = int(load/persize)
+            progress.update(percent, self._fname, u'Size: ' + self._human(firstsize) + u' / ' + self._human(size).strip(), u'Load: ' + self._human(load))
             if progress.iscanceled():
                 progress.close()
                 return self._end()
         progress.close()
 
-        from kls import KLS
-        status = KLS('LibTorrent')
-        status.dialog.create()
-
-        xbmcvfs.rename(self._filename, self._filename)
         if info:
-            info['size'] = selfile.size
+            info['size'] = size
             xbmc.Player().play(self._filename.encode('utf8'), info)
         else:
             xbmc.Player().play(self._filename.encode('utf8'))
 
+        window_info = LibTorrentInfo()
+
         while xbmc.Player().isPlaying():
+
+            if xbmc.getCondVisibility('Player.Paused'):
+                window_info.show()
+            else:
+                window_info.hide()
+
+            window_info.update(**self._get_state(file_id, size))
 
 
             if not self._complete:
@@ -930,6 +941,8 @@ class LibTorrent:
                                 xbmc.executebuiltin('XBMC.Notification("%s", "%s", %s)' % ('Download complete', self._fname, 5000))
             
             time.sleep(1)
+
+        window_info.hide()
 
         return self._end()
 
