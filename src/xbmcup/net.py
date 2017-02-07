@@ -1051,7 +1051,7 @@ class LibTorrent:
         return torrent_info
     
     def _human(self, size):
-        human = None
+        human, factor = None, 1
         for h, f in (('KB', 1024), ('MB', 1024*1024), ('GB', 1024*1024*1024), ('TB', 1024*1024*1024*1024)):
             if size/f > 0:
                 human = h
