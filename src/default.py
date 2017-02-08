@@ -490,7 +490,7 @@ class RutrackerBase(Handler, Scrapers):
                     
                     # получаем инфу по скриншотам, коверу и описанию
                     profile = self.rutracker.profile(item['id'])
-                    
+
                     # общий для всех popup (Info)
                     popup = [(Link('info'), self.lang[40001])]
                     
@@ -499,7 +499,7 @@ class RutrackerBase(Handler, Scrapers):
                     
                     # получаем данные из скрапера
                     scraper = self.scraper(CONTENT[self.argv['content']]['scraper'], item)
-                    
+
                     # если фанарт выключен принудительно, то отключаем его
                     if not fanart_view:
                         scraper['fanart'] = None

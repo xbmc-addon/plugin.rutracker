@@ -49,12 +49,19 @@ class Handler:
             
         if 'label' in kwarg and kwarg['label']:
             item.setLabel2(kwarg['label'])
-        
+
+        art = {}
+        fanart = self._gsetting.get('fanart')
+        if 'fanart' in kwarg and kwarg['fanart']:
+            fanart = kwarg['fanart']
+        if fanart:
+            art['fanart'] = fanart
         if 'icon' in kwarg and kwarg['icon']:
-            item.setIconImage(kwarg['icon'])
-        
+            art['icon'] = kwarg['icon']
         if 'thumb' in kwarg and kwarg['thumb']:
-            item.setThumbnailImage(kwarg['thumb'])
+            art['thumb'] = kwarg['thumb']
+        if art:
+            item.setArt(art)
         
         if 'popup' in kwarg and kwarg['popup']:
             replace = False
@@ -79,13 +86,6 @@ class Handler:
         if 'property' in kwarg and kwarg['property']:
             for key, value in kwarg['property']:
                 item.setProperty(key, value)
-        
-        fanart = self._gsetting.get('fanart')
-        if 'fanart' in kwarg and kwarg['fanart']:
-            fanart = kwarg['fanart']
-        if fanart:
-            item.setProperty('fanart_image', fanart)
-        
         
         folder = True
         if 'folder' in kwarg and not kwarg['folder']:
@@ -145,7 +145,7 @@ class Handler:
     
     def handle(self):
         raise NotImplementedError()
-    
+
 
 class Plugin:
     def __init__(self, *handler):
@@ -259,4 +259,3 @@ class Lang(object):
         except KeyError:
             self._cache[token] = self._addon.getLocalizedString(id=token)
             return self._cache[token]
-            

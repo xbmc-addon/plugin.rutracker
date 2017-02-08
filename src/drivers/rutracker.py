@@ -133,7 +133,7 @@ class RuTracker:
 
             
             folder.extend(torrent)
-            
+
             return {'pages': pages, 'data': folder}
     
     

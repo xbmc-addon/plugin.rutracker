@@ -422,6 +422,7 @@ class KinoPoisk:
     
     
     def person(self, name):
+        #response = self.http.fetch('https://www.kinopoisk.ru/index.php?level=7&from=forma&result=adv&m_act%5Bfrom%5D=forma&m_act%5Bwhat%5D=actor&m_act%5Bfind%5D=' + urllib.quote_plus(name.encode('windows-1251')), headers=self.headers)
         response = self.http.fetch('http://www.kinopoisk.ru/s/type/people/list/1/find/' + urllib.quote_plus(name.encode('windows-1251')) + '/order/relevant/', headers=self.headers)
         if response.error:
             return None
@@ -433,8 +434,8 @@ class KinoPoisk:
             for block in re.compile('<p class="pic">(.+?)<div class="clear">', re.U|re.S).findall(body.group(1)):
                 
                 id, name, original, year, poster = None, None, None, None, None
-                
-                r = re.compile('<p class="name"><a href="http://www\.kinopoisk\.ru/level/4/people/([0-9]+)[^>]+>([^<]+)</a>', re.U|re.S).search(block)
+
+                r = re.compile('<p class="name"><a href="/name/([0-9]+)[^>]+>([^<]+)</a>', re.U|re.S).search(block)
                 if r:
                     id = r.group(1)
                     name = r.group(2).strip()
@@ -466,9 +467,10 @@ class KinoPoisk:
         
         res = {}
 
-        r = re.compile('id="sort_block">(.+?)<style>', re.U|re.S).search(response.body.decode('windows-1251'))
+        r = re.compile('id="sort_block">(.+?)<div id="block_right"', re.U|re.S).search(response.body.decode('windows-1251'))
         if r:
-            for block in r.group(1).split(u'<table cellspacing="0" cellpadding="0" border="0" width="100%">'):
+            for block in r.group(1).split(u'<tr><td colspan="3" class="specializationBox')[1:]:
+
                 work = None
                 
                 for w in ('actor', 'director', 'writer', 'producer', 'producer_ussr', 'composer', 'operator', 'editor', 'design', 'voice', 'voice_director'):
@@ -480,7 +482,7 @@ class KinoPoisk:
                     
                     movies = []
                     
-                    for id, name in re.compile('<span class="name"><a href="/film/([0-9]+)/" >([^<]+?)</a>', re.U).findall(block):
+                    for id, name in re.compile('<span class="name"><a href="/film/([0-9]+)/[^>]+>([^<]+?)</a>', re.U).findall(block):
                         for tag in (u'(мини-сериал)', u'(сериал)'):
                             if name.find(tag) != -1:
                                 break
@@ -659,13 +661,13 @@ class KinoPoisk:
         # имя, оригинальное имя, девиз, цензура, год, top250
         # runtime - длительность фильма (в отдельную переменную, иначе не видно размер файла)
         for tag, reg, cb in (
-            ('title', '<title>(.+?)</title>', self.html.string),
+            ('title', '<h1 class="moviename-big" itemprop="name">(.+?)</h1>', self.html.string),
             ('originaltitle', 'itemprop="alternativeHeadline">([^<]*)</span>', self.html.string),
             ('tagline', '<td style="color\: #555">&laquo;(.+?)&raquo;</td></tr>', self.html.string),
             ('mpaa', 'images/mpaa/([^\.]+).gif', self.html.string),
             ('runtime', '<td class="time" id="runtime">[^<]+<span style="color\: #999">/</span>([^<]+)</td>', self.html.string),
             ('year', '<a href="/lists/m_act%5Byear%5D/([0-9]+)/"', int),
-            ('top250', 'Топ250\: <a\shref="/level/20/#([0-9]+)', int)
+            ('top250', '<a href="/level/20/#([0-9]+)', int)
             
             ):
             r = re.compile(reg, re.U).search(html)
@@ -691,20 +693,8 @@ class KinoPoisk:
                 if r2:
                     res['info'][tag] = u', '.join(r2)
         
-        # актеры
-        r = re.compile(u'<h4>В главных ролях:</h4>(.+?)</ul>', re.U|re.S).search(html)
-        if r:
-            actors = []
-            for r in re.compile('<li itemprop="actors"><a [^>]+>([^<]+)</a></li>', re.U).findall(r.group(1)):
-                r = self.html.string(r)
-                if r and r != '...':
-                    actors.append(r)
-            if actors:
-                res['info']['cast'] = actors[:]
-                #res['info']['castandrole'] = actors[:]
-
         # описание фильма
-        r = re.compile('<span class="_reachbanner_"><div class="brand_words" itemprop="description">(.+?)</div></span>', re.U).search(html)
+        r = re.compile('<span class="_reachbanner_"><div class="brand_words film-synopsys" itemprop="description">(.+?)</div></span>', re.U).search(html)
         if r:
             plot = self.html.text(r.group(1).replace('<=end=>', '\n'))
             if plot:
@@ -745,6 +735,17 @@ class KinoPoisk:
             if poster:
                 res['thumb'] = 'http://kinopoisk.ru' + poster
 
+        # актеры
+        r = re.compile(u'<h4>В главных ролях:</h4>(.+?)</ul>', re.U|re.S).search(html)
+        if r:
+            actors = []
+            for r in re.compile('<li itemprop="actors"><a [^>]+>([^<]+)</a></li>', re.U).findall(r.group(1)):
+                r = self.html.string(r)
+                if r and r != '...':
+                    actors.append(r)
+            if actors:
+                res['info']['cast'] = actors[:]
+
         menu = re.compile('<ul id="newMenuSub" class="clearfix(.+?)<!\-\- /menu \-\->', re.U|re.S).search(html)
         if menu:
             menu = menu.group(1)
@@ -769,6 +770,8 @@ class KinoPoisk:
                             r = re.compile('id="image" src="([^"]+)"', re.U|re.S).search(html)
                             if r:
                                 res['fanart'] = r.group(1).strip()
+                                if res['fanart'].startswith('//'):
+                                    res['fanart'] = 'http:' + res['fanart']
                                 
 
             # если нет фанарта (обоев), то пробуем получить кадры
@@ -791,6 +794,8 @@ class KinoPoisk:
                             r = re.compile('id="image" src="([^"]+)"', re.U|re.S).search(html)
                             if r:
                                 res['fanart'] = r.group(1).strip()
+                                if res['fanart'].startswith('//'):
+                                    res['fanart'] = 'http:' + res['fanart']
 
             
             # студии
