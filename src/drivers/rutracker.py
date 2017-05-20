@@ -109,7 +109,7 @@ class RuTracker:
             folder = []
             torrent = []
             
-            group_list = re.compile(r'<table class="forumline forum">(.+?)</table>', re.U|re.S).findall(html)
+            group_list = re.compile(r'<table class="[^"]*forumline forum">(.+?)</table>', re.U|re.S).findall(html)
             if group_list:
                 for group in group_list:
                     
