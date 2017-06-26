@@ -78,7 +78,7 @@ class RuTracker:
         
         # INDEX
         if id is None:
-            html = self.http.get('http://rutracker.cr/forum/index.php')
+            html = self.http.get('http://rutracker.nl/forum/index.php')
             if not html:
                 return html
             
@@ -100,7 +100,7 @@ class RuTracker:
             if page > 1:
                 page_query = '&start=' + str(50*(page-1))
             
-            html = self.http.get('http://rutracker.cr/forum/viewforum.php?f=' + str(id) + '&sort=2' + page_query)
+            html = self.http.get('http://rutracker.nl/forum/viewforum.php?f=' + str(id) + '&sort=2' + page_query)
             if not html:
                 return html
             
@@ -152,7 +152,7 @@ class RuTracker:
             search = search.encode('windows-1251')
         
         # проверяем авторизацию
-        html = self.http.get('http://rutracker.cr/forum/index.php')
+        html = self.http.get('http://rutracker.nl/forum/index.php')
         if not html:
             return html
         
@@ -180,7 +180,7 @@ class RuTracker:
         params.extend([('f[]', x) for x in folder])
 
         # делаем поиск
-        html = self.http.post('http://rutracker.cr/forum/tracker.php', params)
+        html = self.http.post('http://rutracker.nl/forum/tracker.php', params)
         if not html:
             return html
 
@@ -233,7 +233,7 @@ class RuTracker:
         if page > 1:
             page_query = '&start=' + str(30*(page-1))
             
-        html = self.http.get('http://rutracker.cr/forum/viewtopic.php?t=' + str(id) + page_query)
+        html = self.http.get('http://rutracker.nl/forum/viewtopic.php?t=' + str(id) + page_query)
         if not html:
             return html
         
@@ -461,7 +461,7 @@ class RuTracker:
         return None
 
     def _hash(self, id):
-        html = self.http.get('http://rutracker.cr/forum/viewtopic.php?t=' + str(id))
+        html = self.http.get('http://rutracker.nl/forum/viewtopic.php?t=' + str(id))
         if not html:
             return False, html
         r = self.re['hash'].search(html)
@@ -470,7 +470,7 @@ class RuTracker:
         return True, str(r.group(1))
     
     def _profile(self, id):
-        html = self.http.guest('http://rutracker.cr/forum/viewtopic.php?t=' + str(id))
+        html = self.http.guest('http://rutracker.nl/forum/viewtopic.php?t=' + str(id))
         if not html:
             return False, html
         
@@ -538,7 +538,7 @@ class RuTracker:
         return res
     
     def _load_catalog_http(self):
-        html = self.http.get('http://rutracker.cr/forum/tracker.php')
+        html = self.http.get('http://rutracker.nl/forum/tracker.php')
         if not html:
             return html
         
@@ -592,7 +592,7 @@ class RuTrackerHTTP:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3',
             'Cache-Control': 'no-cache',
-            'Referer': 'http://rutracker.cr/forum/index.php'
+            'Referer': 'http://rutracker.nl/forum/index.php'
         }
     
     def guest(self, url):
@@ -615,18 +615,18 @@ class RuTrackerHTTP:
         id = str(id)
 
         # проверяем авторизацию
-        html = self.get('http://rutracker.cr/forum/viewtopic.php?t=' + id)
+        html = self.get('http://rutracker.nl/forum/viewtopic.php?t=' + id)
         if not html:
             return html
 
         # хакаем куки
         cookies = cookielib.MozillaCookieJar()
         cookies.load(self.http.request.cookies)
-        cookies.set_cookie(cookielib.Cookie(version=0, name='bb_dl', value=id, port=None, port_specified=False, domain='.rutracker.cr', domain_specified=False, domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=True, comment=None, comment_url=None, rest={'HttpOnly': None}, rfc2109=False))
+        cookies.set_cookie(cookielib.Cookie(version=0, name='bb_dl', value=id, port=None, port_specified=False, domain='.rutracker.nl', domain_specified=False, domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=True, comment=None, comment_url=None, rest={'HttpOnly': None}, rfc2109=False))
         cookies.save(self.http.request.cookies, ignore_discard=True, ignore_expires=True)
 
         # тянем торрент
-        response = self.http.fetch('http://rutracker.cr/forum/dl.php?t=' + id, cookies='rutracker.moz', headers=self.headers, method='POST')
+        response = self.http.fetch('http://rutracker.nl/forum/dl.php?t=' + id, cookies='rutracker.moz', headers=self.headers, method='POST')
         if response.error:
             return None
         else:
@@ -667,7 +667,7 @@ class RuTrackerHTTP:
                 params['cap_sid'] = self.captcha_sid
                 params[self.captcha_code] = self.captcha_code_value
 
-            response = self.http.fetch('http://rutracker.cr/forum/login.php', cookies='rutracker.moz', headers=self.headers, method='POST', params=params)
+            response = self.http.fetch('http://rutracker.nl/forum/login.php', cookies='rutracker.moz', headers=self.headers, method='POST', params=params)
             self.captcha_sid, self.captcha_code, self.captcha_code_value = None, None, None
             if response.error:
                 return None
